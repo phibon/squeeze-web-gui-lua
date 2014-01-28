@@ -1,0 +1,48 @@
+<table>
+  <tr>
+    <td>
+	  <a href="/shutdown.html"><img src="{{{logo_small}}}" 
+	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
+    </td>
+    <td>
+      <h2>{{{title}}}</h2>
+    </td>
+  </tr>
+</table>
+
+<hr />
+
+<h4>{{{control}}}</h4>
+
+<form id="shutdown" name="shutdown" action="/shutdown.html" method="post">
+<table>
+<tr>
+  <td align="right">
+	<input type="submit" id="halt" name="halt" value="{{{halt}}}"/>
+  </td>
+  <td>
+	{{{halt_desc}}}
+  </td>
+</tr>
+<tr>
+  <td align="right">
+	<input type="submit" id="reboot" name="reboot" value="{{{reboot}}}"/>
+  </td>
+  <td>
+	{{{reboot_desc}}}
+  </td>
+<tr>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+</tr>
+<tr>
+  <td align="right">
+	<input type="checkbox" name="force" value="true" id="force"/>
+  </td>
+  <td>
+	{{{force_desc}}}
+  </td>
+</tr>
+</table>
+</form>

@@ -1,0 +1,37 @@
+<table>
+  <tr>
+    <td>
+	  <a href="/system.html"><img src="{{{logo_small}}}" 
+	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
+    </td>
+    <td>
+      <h2>{{{title}}}</h2>
+    </td>
+  </tr>
+</table>
+
+<hr />
+
+<h4>{{{timezone}}}</h4>
+
+<form id="system" name="system" action="/system.html" method="post">
+<table>
+<tr>
+  <td align="right">{{{timezone}}}<img src='static/tooltip.gif' title="{{{timezone_tip}}}" alt="{{{timezone_tip}}}" /></td>
+  <td>
+	<select name="timezone" id="timezone">
+	  {{#p_zones}}
+      <option value="{{{zone}}}" {{{selected}}}>{{{zone}}}</option>
+	  {{/p_zones}}
+	</select>
+  </td>
+</tr>
+<tr>
+  <td colspan="2" align="right">
+	<input type="reset" name="reset" value="{{{reset}}}"/>
+	<input type="submit" id="timezone" name="timezone" value="{{{save}}}"/>
+  </td>
+</tr>
+</table>
+</form>

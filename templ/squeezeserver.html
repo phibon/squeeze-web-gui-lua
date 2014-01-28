@@ -1,0 +1,48 @@
+<table>
+  <tr>
+    <td>
+	  <a href="/squeezeserver.html"><img src="{{{logo_small}}}" 
+	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
+    </td>
+    <td>
+      <h2>{{{title}}}</h2>
+    </td>
+  </tr>
+</table>
+
+<hr />
+
+<h4>{{{service}}}</h4>
+
+<form id="squeezeserver" name="squeezeserver" action="/squeezeserver.html" method="post">
+<table>
+<tr>
+<td>
+  <textarea name="status" cols="100" rows="8" readonly="readonly" id="squeezeserver_status">{{{ p_status}}}</textarea>
+</td>
+</tr>
+<tr>
+<td align="right">
+  <input type="submit" id="refresh" name="refresh" value="{{refresh}}"/>
+  <input type="submit" id="enable" name="enable" value="{{enable}}"/>
+  <input type="submit" id="disable" name="disable" value="{{disable}}"/>
+  <input type="submit" id="start" name="start" value="{{start}}"/>
+  <input type="submit" id="stop" name="stop" value="{{stop}}"/>
+  <input type="submit" id="restart" name="restart" value="{{restart}}"/>
+</td>
+</tr>
+<tr>
+<td align="right">
+  <input type="submit" id="enableAndStart" name="enableAndStart" value="{{{enable_start}}}"/>
+  <input type="submit" id="disableAndStop" name="disableAndStop" value="{{{disable_stop}}}"/>
+</td>
+</tr>
+</table>
+</form>
+
+<hr />
+
+<h4>{{{configuration}}}</h4>
+<p><a href="{{p_server_url}}" target="blank_">{{{web_interface}}}</a>
+</p>

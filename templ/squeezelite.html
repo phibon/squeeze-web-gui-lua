@@ -1,0 +1,149 @@
+<table>
+  <tr>
+    <td>
+	  <a href="/squeezelite.html"><img src="{{{logo_small}}}" 
+	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
+    </td>
+    <td>
+      <h2>{{{title}}}</h2>
+    </td>
+  </tr>
+</table>
+
+<hr />
+
+<h4>{{{service}}}</h4>
+
+<form id="squeezelite_service" name="squeezelite_service" action="/squeezelite.html" method="post">
+<table>
+<tr>
+<td>
+  <textarea name="status" cols="100" rows="4" readonly="readonly" id="squeezelite_status">{{{p_status}}}</textarea>
+</td>
+</tr>
+<form id="squeezelite_service" name="squeezelite_service" action="/squeezelite.html" method="post">
+<tr>
+<td align="right">
+  <input type="submit" id="refresh" name="refresh" value="{{refresh}}"/>
+  <input type="submit" id="enable" name="enable" value="{{enable}}"/>
+  <input type="submit" id="disable" name="disable" value="{{disable}}"/>
+  <input type="submit" id="start" name="start" value="{{start}}"/>
+  <input type="submit" id="stop" name="stop" value="{{stop}}"/>
+  <input type="submit" id="restart" name="restart" value="{{restart}}"/>
+</td>
+</tr>
+<tr>
+<td align="right">
+  <input type="submit" id="enableAndStart" name="enableAndStart" value="{{{enable_start}}}"/>
+  <input type="submit" id="disableAndStop" name="disableAndStop" value="{{{disable_stop}}}"/>
+</td>
+</tr>
+</table>
+</form>
+
+<hr />
+
+<h4>{{{configuration}}}</h4>
+
+{{#p_error}}
+<ul class="errorMessage">
+  <li><span>{{{p_error}}}</span></li>
+</ul>
+{{/p_error}}
+
+<form id="squeezelite_config" name="squeezelite_config" action="/squeezelite.html" method="post">
+<table>
+<tr>
+  <td align="right">{{{name}}}<img src='static/tooltip.gif' title="{{{name_tip}}}" alt="{{{name_tip}}}" /></td>
+  <td><input type="text" name="name" value="{{{p_name}}}" id="squeezelite_name" class="size-300px"/></td>      
+</tr>
+<tr>
+  <td align="right">{{{mac}}}<img src='static/tooltip.gif' title="{{{mac_tip}}}" alt="{{{mac_tip}}}" /></td>
+  <td><input type="text" name="mac" value="{{{p_mac}}}" id="squeezelite_mac" class="size-300px"/></td>
+</tr>
+<tr>
+  <td />
+  <td><input type="checkbox" name="defaultmac" value="true" id="squeezelite_defaultmac"/>{{{default_mac}}}</td>
+</tr>
+<tr>
+  <td align="right">{{{device}}}<img src='static/tooltip.gif' title="{{{device_tip}}}" alt="{{{device_tip}}}" /></td>
+  <td>
+	<select name="device" id="squeezelite_device">
+	  {{#p_devices}}
+      <option value="{{{device}}}" {{{selected}}}>{{{device}}}</option>
+	  {{/p_devices}}
+	</select>
+  </td>
+</tr>
+<tr>
+  <td align="right">{{{rate}}}<img src='static/tooltip.gif' title="{{{rate_tip}}}" alt="{{{rate_tip}}}" /></td>
+  <td><input type="text" name="rate" value="{{{p_rate}}}" id="squeezelite_rate" class="size-300px"/></td>
+</tr>
+<tr>
+<tr>
+  <td align="right">{{{logfile}}}<img src='static/tooltip.gif' title="{{{logfile_tip}}}" alt="{{{logfile_tip}}}" /></td>
+  <td><input type="text" name="logfile" value="{{{p_logfile}}}" id="squeezelite_logfile" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{loglevel}}}<img src='static/tooltip.gif' title="{{{loglevel_tip}}}" alt="{{{loglevel_tip}}}" /></td>
+  <td><input type="text" name="loglevel" value="{{{p_loglevel}}}" id="squeezelite_loglevel" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{priority}}}<img src='static/tooltip.gif' title="{{{priority_tip}}}" alt="{{{priority_tip}}}" /></td>
+  <td><input type="text" name="priority" value="{{{p_priority}}}" id="squeezelite_priority" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{buffer}}}<img src='static/tooltip.gif' title="{{{buffer_tip}}}" alt="{{{buffer_tip}}}" /></td>
+  <td><input type="text" name="buffer" value="{{{p_buffer}}}" id="squeezelite_buffer" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{codec}}}<img src='static/tooltip.gif' title="{{{codec_tip}}}" alt="{{{codec_tip}}}" /></td>
+  <td><input type="text" name="codec" value="{{{p_codec}}}" id="squeezelite_codec" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{alsa}}}<img src='static/tooltip.gif' title="{{{alsa_tip}}}" alt="{{{alsa_tip}}}" /></td>
+  <td><input type="text" name="alsa" value="{{{p_alsa}}}" id="squeezelite_alsa" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{resample}}}<img src='static/tooltip.gif' title="{{{resample_tip}}}" alt="{{{resample_tip}}}" /></td>
+  <td>
+	<input type="checkbox" name="resample" value="true" {{{p_resample_checked}}} id="squeezelite_resample" />
+	<input type="text" name="resample_params" value="{{{p_resample_params}}}" id="squeezelite_resample_params" class="size-100px"/>
+  </td>
+</tr>
+<tr>
+  <td align="right">{{{dop}}}<img src='static/tooltip.gif' title="{{{dop_tip}}}" alt="{{{dop_tip}}}" /></td>
+  <td>
+	<input type="checkbox" name="dop" value="true" {{{p_dop_checked}}} id="squeezelite_dop class=" />
+	<input type="text" name="dop_params" value="{{{p_dop_params}}}" id="squeezelite_dop_params" class="size-100px"/>
+  </td>
+</tr>
+<tr>
+  <td align="right">{{{vis}}}<img src='static/tooltip.gif' title="{{{vis_tip}}}" alt="{{{vis_tip}}}" /></td>
+  <td>
+	<input type="checkbox" name="vis" value="true" {{{p_vis_checked}}} id="squeezelite_vis class=" />
+  </td>
+</tr>
+<tr>
+  <td align="right">{{{other}}}<img src='static/tooltip.gif' title="{{{other_tip}}}" alt="{{{other_tip}}}" /></td>
+  <td><input type="text" name="other" value="{{{p_other}}}" id="squeezelite_other" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{server}}}<img src='static/tooltip.gif' title="{{{server_tip}}}" alt="{{{server_tip}}}" /></td>
+  <td><input type="text" name="server" value="{{{p_server}}}" id="squeezelite_server" class="size-300px"/></td>
+</tr>
+<tr>
+  <td colspan="2" align="right">
+	<input type="reset" name="reset" value="{{{reset}}}"/>
+	<input type="submit" id="squeezelite_config_save" name="squeezelite_config_save" value="{{{save}}}"/>
+  </td>
+</tr>
+<tr>
+  <td colspan="2" align="right">
+	<input type="submit" id="squeezelite_config_saverestart" name="squeezelite_config_saverestart" value="{{{save_restart}}}"/>
+  </td>
+</tr>
+</table>
+</form>
+

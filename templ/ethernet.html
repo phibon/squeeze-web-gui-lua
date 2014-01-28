@@ -1,0 +1,35 @@
+<table>
+  <tr>
+    <td>
+	  <a href="/ethernet.html"><img src="{{{logo_small}}}" 
+	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
+    </td>
+    <td>
+      <h2>{{{title}}}</h2>
+    </td>
+  </tr>
+</table>
+
+<hr />
+
+<h4>{{{status}}}</h4>
+
+<form id="ethernet" name="ethernet" action="/ethernet.html" method="get">
+<table>
+<tr>
+<td>
+  <textarea name="status" cols="100" rows="7" readonly="readonly" id="ethernet_status">{{{ p_status }}}</textarea>
+</td>
+</tr>
+<tr>
+<td align="right">
+  <input type="submit" id="refresh" name="refresh" value="{{refresh}}"/>
+</td>
+</tr>
+</table>
+</form>
+
+<hr />
+
+<h4>{{{configuration}}}</h4>
