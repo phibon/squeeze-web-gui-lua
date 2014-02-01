@@ -20,19 +20,24 @@
 -- You should have received a copy of the GNU General Public License
 -- along with squeeze-web-gui-lua. If not, see <http://www.gnu.org/licenses/>.
 
--- status: very incomplete proof of concept code using Turbo.lua
--- See http://turbolua.org.
-
 local turbo = require('turbo')
 local io    = require('io')
 local lfs   = require('lfs')
 
+-- globals accessed by required modules
+log   = turbo.log
+util  = {}
+
+local NetworkConfig     = require('squeeze-web-gui.NetworkConfig')
 local SqueezeliteConfig = require('squeeze-web-gui.SqueezeliteConfig')
 local strings           = require("squeeze-web-gui.Strings")
 
------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 
 -- configuration
+
+-- release version id
+local release = "test"
 
 -- server port
 local PORT = 8081
@@ -42,31 +47,30 @@ local path  = "."
 local templ_path  = path .. '/templ/'
 local static_path = path .. '/static/'
 
+-- interface ids
+local eth_id  = "eth0"
+local wlan_id = "wlan0"
+
 -- languages supported and default
 local languages = { 'EN', 'DE' }
 local language = 'EN'
 
--- version string
--- local version = { release = 'test' }
-
--- debug mode - log rather than execute
-local debug = arg[1] and arg[1] == '--debug'
-
 ------------------------------------------------------------------------------------------
 
---utils
-local log = turbo.log
+-- utils
+local debug      = arg[1] and arg[1] == '--debug'
+local test_mode  = arg[1] and arg[1] == '--test'
 
-function execute(cmd)
-	if debug then
+util.execute = function(cmd)
+	if test_mode then
 		log.debug("execute: " .. cmd)
 		return 
 	end
 	os.execute(cmd)
 end
 
-function capture(cmd)
-	if debug then
+util.capture = function(cmd)
+	if test_mode then
 		log.debug("capture: " .. cmd)
 		return "capture: " .. cmd
 	end
@@ -76,15 +80,7 @@ function capture(cmd)
 	return s
 end
 
-function dump(o)
-	for k, v in pairs(o) do
-		_, k = pcall(tostring, k)
-		_, v = pcall(tostring, v)
-		print((k or "") .. " -> " .. (v or ""))
-	end
-end
-
-if debug then
+if test_mode then
 	-- log string misses, excluded params which start with p_
 	local func = function(t, str) 
 					 if not string.match(str, "^p_") then
@@ -94,20 +90,21 @@ if debug then
 	setmetatable(strings['base'][language], { __index = func })
 end
 
+if not debug and not test_mode then
+	log.categories.debug   = false
+	log.categories.success = false
+end
+
 ------------------------------------------------------------------------------------------
 
 -- setup handlers
 local templ = turbo.web.Mustache.TemplateHelper(templ_path)
 
-local IndexHandler       = class("IndexHandler", turbo.web.RequestHandler)
-local SystemHandler      = class("SystemHandler", turbo.web.RequestHandler)
-local EthernetHandler    = class("EthernetHandler", turbo.web.RequestHandler)
-local WirelessHandler    = class("WirelessHandler", turbo.web.RequestHandler)
-local SqueezeliteHandler = class("SqueezeliteHandler", turbo.web.RequestHandler)
-local SqueezeserverHandler = class("SqueezeserverHandler", turbo.web.RequestHandler)
-local ShutdownHandler    = class("ShutdownHandler", turbo.web.RequestHandler)
-local FaqHandler         = class("FaqHandler", turbo.web.RequestHandler)
-local HelpHandler        = class("HelpHandler", turbo.web.RequestHandler)
+local PageHandler = class("PageHandler", turbo.web.RequestHandler)
+
+-- cached param and strings table for footer
+local footer_t = { release = release }
+setmetatable(footer_t, { __index = strings['footer'][language] })
 
 -- common actions
 local service_actions = {
@@ -121,32 +118,32 @@ local service_actions = {
 	disableAndStop = { "sudo systemctl disable %s", "sudo systemctl stop %s" },
 }
 
-additional_methods = {
-	renderResult = function(self, template, t)
-					   self:write( templ:render('header.html', strings['header'][language]) )
-					   self:write( templ:render(template, t) )
-					   self:write( templ:render('footer.html', strings['footer'][language]))
-				   end,
-	serviceActions = function(self, service)
-						 for action, val in pairs(service_actions) do
-							 if self:get_argument(action, false) then
-								 for _, str in ipairs(val) do
-									 execute(string.format(str, service))
-								 end
-							 end
-						 end
-					 end
-}
+function PageHandler:renderResult(template, t)
+	self:write( templ:render('header.html', strings['header'][language]) )
+	self:write( templ:render(template, t) )
+	self:write( templ:render('footer.html', footer_t) )
+end
 
-IndexHandler:include(additional_methods)
-SystemHandler:include(additional_methods)
-EthernetHandler:include(additional_methods)
-WirelessHandler:include(additional_methods)
-SqueezeliteHandler:include(additional_methods)
-SqueezeserverHandler:include(additional_methods)
-ShutdownHandler:include(additional_methods)
-FaqHandler:include(additional_methods)
-HelpHandler:include(additional_methods)
+function PageHandler:serviceActions(service)
+	for action, val in pairs(service_actions) do
+		if self:get_argument(action, false) then
+			for _, str in ipairs(val) do
+				local cmd = string.format(str, service)
+				log.debug("service action: " .. cmd)
+				util.execute(cmd)
+			end
+		end
+	end
+end
+
+local IndexHandler       = class("IndexHandler", PageHandler)
+local SystemHandler      = class("SystemHandler", PageHandler)
+local NetworkHandler     = class("NetworkHandler", PageHandler)
+local SqueezeliteHandler = class("SqueezeliteHandler", PageHandler)
+local SqueezeserverHandler = class("SqueezeserverHandler", PageHandler)
+local ShutdownHandler    = class("ShutdownHandler", PageHandler)
+local FaqHandler         = class("FaqHandler", PageHandler)
+local HelpHandler        = class("HelpHandler", PageHandler)
 
 ------------------------------------------------------------------------------------------
 
@@ -155,9 +152,10 @@ function IndexHandler:get()
 	local lang = self:get_argument('locale', false)
 	if lang and strings['languages'][lang] then
 		language = lang
+		setmetatable(footer_t, { __index = strings['footer'][language] })
 	end
 
-	local t = { p_languages = {} }
+	local t = { p_languages = {}, p_eth_id = eth_id, p_wlan_id = wlan_id }
 
 	local l = t['p_languages']
 	for _, v in ipairs(languages) do
@@ -199,12 +197,12 @@ function SystemHandler:_response()
 	local zones = _zones()
 	table.sort(zones)
 
-	local info = capture("ls -l /etc/localtime")
+	local info = util.capture("ls -l /etc/localtime")
 	local zone = string.match(info, "->%s" .. zonefiles .. "(.-)\n")
 
 	t['p_zones'] = {}
 	for _, v in ipairs(zones) do
-		t['p_zones'][#t['p_zones']+1] = { zone = v, selected = (v == zone and "selected" or "") }
+		table.insert(t['p_zones'], { zone = v, selected = (v == zone and "selected" or "") })
 	end
 
 	setmetatable(t, { __index = strings['system'][language] })
@@ -218,41 +216,135 @@ end
 function SystemHandler:post()
 	local newzone = self:get_argument("timezone", false)
 	if newzone then
-		execute("sudo csos-timeZone " .. newzone)
+		log.debug("setting timezone to " .. newzone)
+		util.execute("sudo csos-timeZone " .. newzone)
 	end
 	self:_response()
 end
 
 ------------------------------------------------------------------------------------------
 
--- ethernet.html
-function EthernetHandler:_response()
+-- network.html
+function _scan_wifi()
+	local status = {}
+	local scan   = {}
+
+	local step1 = util.capture("sudo wpa_cli status")
+	for line in string.gmatch(step1, "(.-)\n") do
+		local k, v = string.match(line, "(.-)=(.*)")
+		if k and v then
+			status[k] = string.lower(v)
+		end
+	end	
+
+	local step2 = util.capture("sudo wpa_cli scan")
+	if string.match(step2, "OK") then
+		local step3 = util.capture("sudo wpa_cli scan_results")
+		for line in string.gmatch(step3, "(.-)\n") do
+			local bssid, freq, signal, flags, ssid = string.match(line, "(%x+:%x+:%x+:%x+:%x+:%x+)%s+(.+)%s+(.+)%s+(.+)%s+(.+)")
+			if ssid then
+				scan[#scan+1] = { ssid = ssid, flags = flags, signal = tonumber(signal) }
+			end
+		end
+	end
+
+	return scan, status
+end
+
+function NetworkHandler:_response(type, err)
+	local int = (type == "eth" and eth_id or wlan_id)
+	local is_wireless = (int == wlan_id)
+	local config = NetworkConfig.get(int, is_wireless)
 	local t = {}
 
-	t['p_status'] = capture("ifconfig eth0")
+	t['p_error'] = err and (strings['squeezelite'][language]["error_" .. err] or 'validation error - ' .. err)
 
-	setmetatable(t, { __index = strings['ethernet'][language] })
-	self:renderResult('ethernet.html', t)
+	t['p_iftype'] = type
+	t['p_is_wlan'] = is_wireless
+	t['p_onboot_checked'] = config.onboot == "true" and "checked" or ""
+	t['p_dhcp_checked']   = config.bootproto == "dhcp" and "checked" or ""
+
+	t['p_status'] = util.capture("ifconfig " .. int)
+
+	for _, v in ipairs(NetworkConfig.params(is_wireless)) do
+		t["p_"..v] = config[v]
+	end
+
+	if is_wireless then
+		local scan, status = _scan_wifi()
+
+		t['p_wpa_state'] = status['wpa_state']
+
+		t['p_essids'] = {}
+		local essids = {}
+		for _, v in ipairs(scan) do
+			table.insert(t['p_essids'], { id = v.ssid, selected = (v.ssid == config.essid and "selected" or "") })
+			essids[v.ssid] = true
+		end
+
+		-- put previous selection on top of list if not already there
+		if not essids[config.essid] then
+			table.insert(t['p_essids'], 1, { id = config.essid, selected = "selected" })
+		end
+		-- add option to add private network
+		table.insert(t['p_essids'], { id = strings['network'][language]['add_private'] })
+	end
+
+	setmetatable(t, { __index = strings['network'][language] })
+	self:renderResult('network.html', t)
 end
 
-function EthernetHandler:get()
-	self:_response()
+function NetworkHandler:get(type)
+	self:_response(type)
 end
 
-------------------------------------------------------------------------------------------
+function NetworkHandler:post(type)
+	local int = (type == "eth" and eth_id or wlan_id)
+	local is_wireless = (int == wlan_id)
 
--- wireless.html
-function WirelessHandler:_response()
-	local t = {}
+	if self:get_argument('network_config_save', false) then
+		local other_ssid = self:get_argument('other_ssid', false)
 
-	t['p_status'] = capture("ifconfig wlan0")
+		local config = {}
+		for _, v in ipairs(NetworkConfig.params(is_wireless)) do
+			config[v] = self:get_argument(v, false)
+		end
 
-	setmetatable(t, { __index = strings['wireless'][language] })
-	self:renderResult('wireless.html', t)
-end
+		if other_ssid then
+			config['essid'] = other_ssid
+		end
 
-function WirelessHandler:get()
-	self:_response()
+		local err = NetworkConfig.validate(config)
+		if err then
+			log.debug("validation error: " .. err)
+			self:_response(type, err)
+			return
+		end
+
+		if is_wireless then
+			local scan, status = _scan_wifi()
+			local ssid_found = false
+			for _, v in ipairs(scan) do
+				if config.essid == v.ssid then
+					ssid_found = true
+				end
+			end
+			config['force_scan'] = not ssid_found
+		end
+		
+		NetworkConfig.set(config, int, is_wireless)
+	end
+
+	if self:get_argument("network_ifdown", false) or self:get_argument("network_ifdownup", false) then
+		log.debug("ifdown " .. int)
+		util.execute("sudo ifdown " .. int)
+	end
+	if self:get_argument("network_ifup", false) or self:get_argument("network_ifdownup", false) then
+		log.debug("ifup " .. int)
+		util.execute("sudo ifup " .. int)
+	end
+
+	self:_response(type)
 end
 
 ------------------------------------------------------------------------------------------
@@ -271,17 +363,17 @@ function SqueezeliteHandler:_response(err)
 	t['p_dop_checked']      = config.dop and "checked" or ""
 	t['p_vis_checked']      = config.vis and "checked" or ""
 
-	t['p_status'] = capture('systemctl status squeezelite.service')
+	t['p_status'] = util.capture('systemctl status squeezelite.service')
 	if config.logfile then
 		local logfile = io.open(config.logfile, "r")
 		if logfile then
 			logfile:close()
-			t['p_status'] = t['p_status'] .. capture('tail ' .. config.logfile)
+			t['p_status'] = t['p_status'] .. util.capture('tail ' .. config.logfile)
 		end
 	end
 	
 	t['p_devices'] = {}
-	local device_info = capture("squeezelite -l")
+	local device_info = util.capture("squeezelite -l")
 	local inc = {}
 	if device_info then
 		for line in string.gmatch(device_info, "(.-)\n") do
@@ -290,7 +382,7 @@ function SqueezeliteHandler:_response(err)
 				id = string.gsub(id, "sysdefault:", "hw:")  -- replace sysdefault:* with hw:*
 				id = string.gsub(id, "default:", "hw:")     -- replace default:* with hw:*
 				if not inc[id] then
-					t['p_devices'][#t['p_devices']+1] = { device = id, selected = (id == config.device and "selected" or "") }
+					table.insert(t['p_devices'], { device = id, selected = (id == config.device and "selected" or "") })
 					inc[id] = 1
 				end
 			end
@@ -320,6 +412,7 @@ function SqueezeliteHandler:post()
 
 		local err = SqueezeliteConfig.validate(config)
 		if err then
+			log.debug("validation error: " .. err)
 			self:_response(err)
 			return
 		end
@@ -327,26 +420,25 @@ function SqueezeliteHandler:post()
 		SqueezeliteConfig.set(config)
 
 		if self:get_argument('squeezelite_config_saverestart', false) then
-			execute(string.format(service_actions['restart'][1], 'squeezelite.service'))
+			util.execute(string.format(service_actions['restart'][1], 'squeezelite.service'))
 		end
 	end
 
 	self:_response()
 end
 
-
 ------------------------------------------------------------------------------------------
 
 -- squeezeserver.html
 function SqueezeserverHandler:_response()
 	local t = {
-		p_status = capture('systemctl status squeezeboxserver.service')
+		p_status = util.capture('systemctl status squeezeboxserver.service')
 	}
 
 	local logfile = io.open("/var/log/squeezeboxserver/server.log", "r")
 	if logfile then
 		logfile:close()
-		t['p_status'] = t['p_status'] .. capture('tail /var/log/squeezeboxserver/server.log')
+		t['p_status'] = t['p_status'] .. util.capture('tail /var/log/squeezeboxserver/server.log')
 	end
 
 	setmetatable(t, { __index = strings['squeezeserver'][language] })
@@ -372,10 +464,12 @@ end
 function ShutdownHandler:post()
 	local force = self:get_argument("force", false)
 	if self:get_argument("halt", false) then
-		execute("sudo csos-halt" .. (force and " -f" or ""))
+		log.debug("halt")
+		util.execute("sudo csos-halt" .. (force and " -f" or ""))
 	end
 	if self:get_argument("reboot", false) then
-		execute("sudo csos-reboot" .. (force and " -f" or ""))
+		log.debug("restart")
+		util.execute("sudo csos-reboot" .. (force and " -f" or ""))
 	end
 	self:renderResult('shutdown.html', strings['shutdown'][language])
 end
@@ -399,15 +493,14 @@ end
 -- register pages and start server
 turbo.web.Application({
     { "^/$", IndexHandler },
-    { "^/index.html$", IndexHandler },
-    { "^/system.html$", SystemHandler },
-    { "^/ethernet.html$", EthernetHandler },
-    { "^/wireless.html$", WirelessHandler },
-    { "^/squeezelite.html$", SqueezeliteHandler },
-    { "^/squeezeserver.html$", SqueezeserverHandler },
-    { "^/shutdown.html$", ShutdownHandler },
-    { "^/faq.html$", FaqHandler },
-    { "^/help.html$", HelpHandler },
+    { "^/index%.html$", IndexHandler },
+    { "^/system%.html$", SystemHandler },
+    { "^/network%-(.-)%.html$", NetworkHandler },
+    { "^/squeezelite%.html$", SqueezeliteHandler },
+    { "^/squeezeserver%.html$", SqueezeserverHandler },
+    { "^/shutdown%.html$", ShutdownHandler },
+    { "^/faq%.html$", FaqHandler },
+    { "^/help%.html$", HelpHandler },
 	{ "^/static/(.*)$", turbo.web.StaticFileHandler, static_path }
 }):listen(PORT)
 

@@ -20,7 +20,8 @@
 -- You should have received a copy of the GNU General Public License
 -- along with squeeze-web-gui-lua. If not, see <http://www.gnu.org/licenses/>.
 
-local print, io, string, os, tonumber, tostring = print, io, string, os, tonumber, tostring
+local io, string, os, tonumber, tostring = io, string, os, tonumber, tostring
+local util, log = util, log
 
 module(...)
 
@@ -39,6 +40,7 @@ function get()
 
 	local conf = io.open(configFile, "r")
 	if conf == nil then
+		log.error("unable to read: " .. configFile)
 		return config
 	end
 
@@ -180,7 +182,11 @@ function set(config)
 		
 		outconf:close()
 		
-		os.execute("sudo csos-squeezeliteConfigUpdate " .. configFileTmp)
-		os.execute("rm " .. configFileTmp)
+		util.execute("sudo csos-squeezeliteConfigUpdate " .. configFileTmp)
+		util.execute("rm " .. configFileTmp)
+
+		log.debug("wrote and updated config")
+	else
+		log.error("unable to write: " .. configFileTmp)
 	end
 end

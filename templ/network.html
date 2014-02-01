@@ -1,0 +1,153 @@
+<script type="text/javascript">
+function dhcpCheck() {
+  if (document.getElementById('dhcp').checked) {
+    document.getElementById('static').style.display = 'none';
+  } else {
+    document.getElementById('static').style.display = '';
+  }
+}
+</script>  
+
+<table>
+  <tr>
+    <td>
+	  <a href="/network-{{p_iftype}}.html"><img src="{{{logo_small}}}" 
+	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
+    </td>
+    <td>
+      <h2>
+		{{#p_is_wlan}}{{{title_wlan}}}{{/p_is_wlan}}
+		{{^p_is_wlan}}{{{title_eth}}}{{/p_is_wlan}}
+	  </h2>
+    </td>
+  </tr>
+</table>
+
+<hr />
+
+<h4>{{{status}}}</h4>
+
+<form id="network" name="network" action="/network-{{p_iftype}}.html" method="get">
+<table>
+<tr>
+<td>
+  <textarea name="status" cols="100" rows="7" readonly="readonly" id="network_status">{{{ p_status }}}</textarea>
+</td>
+</tr>
+<tr>
+<td align="right">
+  <input type="submit" id="refresh" name="refresh" value="{{refresh}}"/>
+</td>
+</tr>
+</table>
+</form>
+
+<hr />
+
+<h4>{{{configuration}}}</h4>
+
+{{#p_error}}
+<ul class="errorMessage">
+  <li><span>{{{p_error}}}</span></li>
+</ul>
+{{/p_error}}
+
+<form id="network_config" name="network_config" action="/network-{{p_iftype}}.html" method="post">
+<table>
+  <col width="175">
+  <col width="500">
+<tr>
+  <td align="right">{{{name}}}</td>
+  <td><font color="blue">{{{p_device}}}</font></td>
+</tr>
+<tr>
+  <td align="right">{{{type}}}</td>
+  <td><font color="blue">{{{p_type}}}</font></td>
+</tr>
+{{#p_is_wlan}}
+<tr>
+  <td align="right">{{{wpa_state}}}</td>
+  <td><font color="blue">{{{p_wpa_state}}}</font></td>
+</tr>
+{{/p_is_wlan}}
+<tr>
+  <td align="right">{{{on_boot}}}</td>
+  <td><input type="checkbox" id="onboot" name="onboot" value="true" {{{p_onboot_checked}}}></td>
+</tr>
+<tr>
+  <td align="right">{{{dhcp}}}</td>
+  <td><input type="checkbox" id="dhcp" name="dhcp" value="true" {{{p_dhcp_checked}}} onclick="javascript:dhcpCheck();"></td>
+</tr>
+
+{{#p_is_wlan}}
+<tr>
+  <td align="right">{{{essid}}}<img src='static/tooltip.gif' title="{{{essid_tip}}}" alt="{{{essid_tip}}}" /></td>
+  <td>
+	<select name="essid" id="essid" class="size-300px">
+	  {{/p_is_wlan}}
+	  {{#p_essids}}
+      <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+	  {{/p_essids}}
+	  {{#p_is_wlan}}
+	</select>
+  </td>
+</tr>
+<tr>
+  <td />
+  <td><input type="text" name="other_ssid" value="{{{p_other_ssid}}}" id="other_ssid" class="size-300px"/></td>      
+</tr>
+<tr>
+  <td align="right">{{{wpa_psk}}}<img src='static/tooltip.gif' title="{{{wpa_psk_tip}}}" alt="{{{wpa_psk_tip}}}" /></td>
+  <td><input type="text" name="wpa_psk" value="{{{p_wpa_psk}}}" id="psk" class="size-300px"/></td>      
+</tr>
+{{/p_is_wlan}}
+</table>
+<table id="static" {{#p_dhcp_checked}} style="display:none" {{/p_dhcp_checked}}>
+  <col width="175">
+  <col width="500">
+<tr>
+  <td align="right">{{{ipaddr}}}<img src='static/tooltip.gif' title="{{{ipaddr_tip}}}" alt="{{{ipaddr_tip}}}" /></td>
+  <td><input type="text" name="ipaddr0" value="{{{p_ipaddr0}}}" id="ipaddress" class="size-300px"/></td>      
+</tr>
+<tr>
+  <td align="right">{{{netmask}}}<img src='static/tooltip.gif' title="{{{netmask_tip}}}" alt="{{{netmask_tip}}}" /></td>
+  <td><input type="text" name="netmask0" value="{{{p_netmask0}}}" id="netmask" class="size-300px"/></td>      
+</tr>
+<tr>
+  <td align="right">{{{gateway}}}<img src='static/tooltip.gif' title="{{{gateway_tip}}}" alt="{{{gateway_tip}}}" /></td>
+  <td><input type="text" name="gateway0" value="{{{p_gateway0}}}" id="gateway" class="size-300px"/></td>      
+</tr>
+<tr>
+  <td align="right">{{{dns1}}}<img src='static/tooltip.gif' title="{{{dns1_tip}}}" alt="{{{dns1_tip}}}" /></td>
+  <td><input type="text" name="dns1" value="{{{p_dns1}}}" id="dns1" class="size-300px"/></td>      
+</tr>
+<tr>
+  <td align="right">{{{dns2}}}<img src='static/tooltip.gif' title="{{{dns2_tip}}}" alt="{{{dns2_tip}}}" /></td>
+  <td><input type="text" name="dns2" value="{{{p_dns2}}}" id="dns2" class="size-300px"/></td>      
+</tr>
+<tr>
+  <td align="right">{{{dns3}}}<img src='static/tooltip.gif' title="{{{dns3_tip}}}" alt="{{{dns3_tip}}}" /></td>
+  <td><input type="text" name="dns3" value="{{{p_dns3}}}" id="dns3" class="size-300px"/></td>      
+</tr>
+<tr>
+  <td align="right">{{{domain}}}<img src='static/tooltip.gif' title="{{{domain_tip}}}" alt="{{{domain_tip}}}" /></td>
+  <td><input type="text" name="domain" value="{{{p_domain}}}" id="domain" class="size-300px"/></td>      
+</tr>
+</table>
+<table width="500">
+<tr>
+  <td colspan="2" align="right">
+	<input type="submit" name="refresh" value="{{{refresh}}}"/>
+	<input type="submit" id="nework_config_save" name="network_config_save" value="{{{save}}}"/>
+  </td>
+</tr>
+<tr>
+  <td colspan="3" align="right">
+	<input type="submit" id="network_ifdown" name="network_ifdown" value="{{{int_down}}}"/>
+	<input type="submit" id="network_ifup" name="network_ifup" value="{{{int_up}}}"/>
+	<input type="submit" id="network_ifdownup" name="network_ifdownup" value="{{{int_downup}}}"/>
+  </td>
+</tr>
+</table>
+</form>
