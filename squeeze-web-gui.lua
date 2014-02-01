@@ -225,32 +225,6 @@ end
 ------------------------------------------------------------------------------------------
 
 -- network.html
-function _scan_wifi()
-	local status = {}
-	local scan   = {}
-
-	local step1 = util.capture("sudo wpa_cli status")
-	for line in string.gmatch(step1, "(.-)\n") do
-		local k, v = string.match(line, "(.-)=(.*)")
-		if k and v then
-			status[k] = string.lower(v)
-		end
-	end	
-
-	local step2 = util.capture("sudo wpa_cli scan")
-	if string.match(step2, "OK") then
-		local step3 = util.capture("sudo wpa_cli scan_results")
-		for line in string.gmatch(step3, "(.-)\n") do
-			local bssid, freq, signal, flags, ssid = string.match(line, "(%x+:%x+:%x+:%x+:%x+:%x+)%s+(.+)%s+(.+)%s+(.+)%s+(.+)")
-			if ssid then
-				scan[#scan+1] = { ssid = ssid, flags = flags, signal = tonumber(signal) }
-			end
-		end
-	end
-
-	return scan, status
-end
-
 function NetworkHandler:_response(type, err)
 	local int = (type == "eth" and eth_id or wlan_id)
 	local is_wireless = (int == wlan_id)
@@ -271,7 +245,7 @@ function NetworkHandler:_response(type, err)
 	end
 
 	if is_wireless then
-		local scan, status = _scan_wifi()
+		local scan, status = NetworkConfig.scan_wifi()
 
 		t['p_wpa_state'] = status['wpa_state']
 
@@ -322,7 +296,7 @@ function NetworkHandler:post(type)
 		end
 
 		if is_wireless then
-			local scan, status = _scan_wifi()
+			local scan, status = NetworkConfig.scan_wifi()
 			local ssid_found = false
 			for _, v in ipairs(scan) do
 				if config.essid == v.ssid then

@@ -72,6 +72,32 @@ function get(int, is_wireless)
 	return config
 end
 
+function scan_wifi()
+	local status = {}
+	local scan   = {}
+
+	local step1 = util.capture("sudo wpa_cli status")
+	for line in string.gmatch(step1, "(.-)\n") do
+		local k, v = string.match(line, "(.-)=(.*)")
+		if k and v then
+			status[k] = string.lower(v)
+		end
+	end	
+
+	local step2 = util.capture("sudo wpa_cli scan")
+	if string.match(step2, "OK") then
+		local step3 = util.capture("sudo wpa_cli scan_results")
+		for line in string.gmatch(step3, "(.-)\n") do
+			local bssid, freq, signal, flags, ssid = string.match(line, "(%x+:%x+:%x+:%x+:%x+:%x+)%s+(.+)%s+(.+)%s+(.+)%s+(.+)")
+			if ssid then
+				scan[#scan+1] = { ssid = ssid, flags = flags, signal = tonumber(signal) }
+			end
+		end
+	end
+
+	return scan, status
+end
+
 function _ip_validate(s, mask)
 	local ip1, ip2, ip3, ip4 = string.match(s, "^(%d+)%.(%d+)%.(%d+)%.(%d+)$")
 	if ip1 and ip2 and ip3 and ip4 then
