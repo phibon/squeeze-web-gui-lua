@@ -30,6 +30,7 @@ util  = {}
 
 local NetworkConfig     = require('squeeze-web-gui.NetworkConfig')
 local SqueezeliteConfig = require('squeeze-web-gui.SqueezeliteConfig')
+local StorageConfig     = require('squeeze-web-gui.StorageConfig')
 local strings           = require("squeeze-web-gui.Strings")
 
 ------------------------------------------------------------------------------------------
@@ -432,44 +433,34 @@ end
 ------------------------------------------------------------------------------------------
 
 -- storage.html
-local localdisks = "/dev/"
-local mountpoints = "/storage"
-
-function _disks()
+function _ids(tab)
 	local t = {}
-	for file in lfs.dir(localdisks) do
-		if string.match(file, "sd%l%d") then
-			t[#t+1] = { id = localdisks .. file }
-		end
+	for _, v in ipairs(tab) do
+		t[#t+1] = { id = v }
 	end
-	table.sort(t, function(a, b) return a.id < b.id end)
 	return t
 end
 
 function StorageHandler:_response()
 	local t = {}
 
-	t['p_disks'] = _disks()
-	t['p_mountpoints'] = { { id = mountpoints } }
-	t['p_types_local'] = { { id = "" }, { id = 'vfat' }, { id = 'ext2' }, { id = 'ext3' }, { id = 'ext4' } }
-	t['p_types_net'] = { { id = "" }, { id = 'cifs' }, { id = 'nfs' } }
-
-	local mounts = util.capture('mount | grep ' .. mountpoints)
-	t['p_status'] = mounts
+	t['p_status']      = StorageConfig.status()
+	t['p_disks']       = _ids(StorageConfig.localdisks())
+	t['p_mountpoints'] = _ids(StorageConfig.mountpoints())
+	t['p_types_local'] = _ids({ '', 'vfat', 'ext2', 'ext3', 'ext4' }, true)
+	t['p_types_net']   = _ids({ '', 'cifs' ,'nfs' }, true)
 
 	local umount_str = strings['storage'][language]['unmount']
 
-	mounts = mounts .. "\n"
-	for line in string.gmatch(mounts, "(.-)\n") do
-		local spec, mountp, type, opt = string.match(line, "(.-) on (.-) type (.-) %((.-)%)")
-		if spec and mountp and type then
-			if type ~= 'cifs' and type ~= 'nfs' then
-			   	t['p_local'] = t['p_local'] or {}
-				table.insert(t['p_local'], { p_spec = spec, p_mountp = mountp, p_type = type, p_opt = opt, p_unmount = umount_str })
-			else
-				t['p_net'] = t['p_net'] or {}
-				table.insert(t['p_net'], { p_spec = spec, p_mountp = mountp, p_type = type, p_opt = opt, p_unmount = umount_str })
-			end
+	for _, v in ipairs(StorageConfig.get()) do
+		if v.type ~= 'cifs' and v.type ~= 'nfs' then
+			t['p_local'] = t['p_local'] or {}
+			table.insert(t['p_local'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opt, p_perm = v.perm, 
+										 p_unmount = umount_str })
+		else
+			t['p_net'] = t['p_net'] or {}
+			table.insert(t['p_net'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opt, p_perm = v.perm,
+									   p_unmount = umount_str })
 		end
 	end
 
@@ -483,18 +474,39 @@ end
 
 function StorageHandler:post()
 	local spec = self:get_argument('spec', false)
-	local mount = self:get_argument('mountpoint', false)
+	local mountp = self:get_argument('mountpoint', false)
 	local type = self:get_argument('type', false)
-	local options = self:get_argument('options', false)
+	local opts = self:get_argument('options', false)
 
 	if self:get_argument('localfs_mount', false) or self:get_argument('netfs_mount', false) then
-		util.execute("sudo umount " .. mount)
-		util.execute("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (options and ("-o " .. options .. " ") or "") ..
-					 spec .. " " .. mount)
+		util.execute("sudo umount " .. mountp)
+		util.execute("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (opts and ("-o " .. opts .. " ") or "") ..
+					 spec .. " " .. mountp)
+		-- if mount worked then persist, storing opts passed not those parsed from active mounts
+		local mounts = StorageConfig.get()
+		for _, v in ipairs(mounts) do
+			if spec == v.spec and mountp == v.mountp then
+				v.opts = opts
+				v.perm = true
+				break
+			end
+		end
+		StorageConfig.set(mounts)
 	end
 
 	if self:get_argument('localfs_unmount', false) or self:get_argument('net_unmount', false) then
-		util.execute("sudo umount " .. mount)
+		util.execute("sudo umount " .. mountp)
+		-- remove mount from persited mounts
+		local mounts = StorageConfig.get()
+		local i = 1
+		while mounts[i] do
+			if mountp == mounts[i].mountp then
+				table.remove(mounts, i)
+				break
+			end
+			i = i + 1
+		end
+		StorageConfig.set(mounts)
 	end
 
 	self:_response()
