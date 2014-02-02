@@ -113,6 +113,22 @@ local strings = {
 			web_interface = "SqueezeServer Web Interface",
 		},
 	},
+	['storage'] = {
+		['EN'] = {
+			title = "Storage",
+			mounts = "Mounted File Systems",
+			localfs = "Local Disks",
+			netfs = "Network Shares",
+			disk = "Disk",
+			network = "Network",
+			mountpoint = "Mountpoint",
+			type = "Type",
+			options = "Options",
+			mount = "Mount",
+			unmount = "Unmount",
+			mount_perm = "Mount Permanently",
+		},
+	},
 	['shutdown'] = {
 		['EN'] = {
 			title = "Shutdown: Reboot or Halt the device",
@@ -142,7 +158,7 @@ local strings = {
 			system = "System",
 			ethernet = "Ethernet Interface",
 			wireless = "Wireless Interface",
-			fstab = "File Systems",
+			storage = "Storage",
 			shutdown = "Shutdown",
 			faq = "FAQ",
 			help = "Help",

@@ -1,0 +1,143 @@
+<table>
+  <tr>
+    <td>
+	  <a href="/storage.html"><img src="{{{logo_small}}}" 
+	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
+    </td>
+    <td>
+      <h2>{{{title}}}</h2>
+    </td>
+  </tr>
+</table>
+
+<hr />
+
+<h4>{{{mounts}}}</h4>
+
+<form id="storage" name="storage" action="/storage.html" method="get">
+<table>
+<tr>
+<td>
+  <textarea name="status" cols="100" rows="7" readonly="readonly" id="network_status">{{{ p_status }}}</textarea>
+</td>
+</tr>
+<tr>
+<td align="right">
+  <input type="submit" id="refresh" name="refresh" value="{{refresh}}"/>
+</td>
+</tr>
+</table>
+</form>
+
+<hr />
+
+<h4>{{{localfs}}}</h4>
+
+<table>
+  <col width="150">
+  <col width="100">
+  <col width="75">
+  <col width="300">
+<tr>
+  <td>{{{disk}}}</td>
+  <td>{{{mountpoint}}}</td>
+  <td>{{{type}}}</td>
+  <td>{{{options}}}</td>
+</tr>
+{{#p_local}}
+<tr>
+  <form id="localfs_config" name="localfs_config" action="/storage.html" method="post">
+  <td><font color="blue">{{{p_spec}}}</font></td>
+  <td><font color="blue">{{{p_mountp}}}</font></td>
+  <td><font color="blue">{{{p_type}}}</font></td>
+  <td><font color="blue">{{{p_perm}}}</font></td>
+  <td>
+	<input type="hidden" name="mountpoint" value="{{{p_mountp}}}">
+	<input type="submit" id="localfs_unmount" name="localfs_unmount" value="{{{p_unmount}}}"/>
+  </td>
+  </form>
+</tr>
+{{/p_local}}
+<tr>
+  <form id="localfs_config" name="localfs_config" action="/storage.html" method="post">
+  <td>
+	<select name="spec" class="size-200px">
+	{{#p_disks}}
+    <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+	{{/p_disks}}
+	</select>
+  </td>
+  <td>
+	<select name="mountpoint" class="size-150px">
+	{{#p_mountpoints}}
+    <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+	{{/p_mountpoints}}
+	</select>
+  </td>
+  <td>
+	<select name="type" class="size-75px">
+	{{#p_types_local}}
+    <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+	{{/p_types_local}}
+	</select>
+  </td>
+  <td><input type="text" name="options" id="options" class="size-300px"/></td>
+  <td><input type="submit" id="localfs_mount" name="localfs_mount" value="{{mount}}"/></td>
+  </form>
+</tr>
+</table>
+
+<hr />
+
+<h4>{{{netfs}}}</h4>
+
+<table>
+  <col width="150">
+  <col width="100">
+  <col width="75">
+  <col width="300">
+<tr>
+  <td>{{{network}}}</td>
+  <td>{{{mountpoint}}}</td>
+  <td>{{{type}}}</td>
+  <td>{{{options}}}</td>
+</tr>
+{{#p_net}}
+<tr>
+  <form id="netfs_config" name="netfs_config" action="/storage.html" method="post">
+  <td><font color="blue">{{{p_spec}}}</font></td>
+  <td><font color="blue">{{{p_mountp}}}</font></td>
+  <td><font color="blue">{{{p_type}}}</font></td>
+  <td><font color="blue">{{{p_perm}}}</font></td>
+  <td>
+	<input type="hidden" name="mountpoint" value="{{{p_mountp}}}">
+	<input type="submit" id="net_unmount" name="net_unmount" value="{{{p_unmount}}}"/>
+  </td>
+  </form>
+</tr>
+{{/p_net}}
+<tr>
+  <form id="netfs_config" name="netfs_config" action="/storage.html" method="post">
+  <td>
+	<input type="text" name="spec" class="size-200px">
+  </td>
+  <td>
+	<select name="mountpoint" class="size-150px">
+	{{#p_mountpoints}}
+    <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+	{{/p_mountpoints}}
+	</select>
+  </td>
+  <td>
+	<select name="type" class="size-75px">
+	{{#p_types_net}}
+    <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+	{{/p_types_net}}
+	</select>
+  </td>
+  <td><input type="text" name="options" id="options" class="size-300px"/></td>
+  <td><input type="submit" id="netfs_mount" name="netfs_mount" value="{{mount}}"/></td>
+  </form>
+</tr>
+</table>
