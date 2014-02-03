@@ -1,5 +1,0 @@
-#!/bin/bash
-
-if [ -e "$1" ]; then
- cp "$1" "/etc/fstab"
-fi

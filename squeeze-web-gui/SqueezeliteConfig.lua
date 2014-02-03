@@ -182,7 +182,7 @@ function set(config)
 		
 		outconf:close()
 		
-		util.execute("sudo csos-squeezeliteConfigUpdate " .. configFileTmp)
+		util.execute("sudo sp-squeezeliteConfigUpdate " .. configFileTmp)
 		util.execute("rm " .. configFileTmp)
 
 		log.debug("wrote and updated config")

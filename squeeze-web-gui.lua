@@ -219,7 +219,7 @@ function SystemHandler:post()
 	local newzone = self:get_argument("timezone", false)
 	if newzone then
 		log.debug("setting timezone to " .. newzone)
-		util.execute("sudo csos-timeZone " .. newzone)
+		util.execute("sudo sp-timeZone " .. newzone)
 	end
 	self:_response()
 end
@@ -523,11 +523,11 @@ function ShutdownHandler:post()
 	local force = self:get_argument("force", false)
 	if self:get_argument("halt", false) then
 		log.debug("halt")
-		util.execute("sudo csos-halt" .. (force and " -f" or ""))
+		util.execute("sudo sp-halt" .. (force and " -f" or ""))
 	end
 	if self:get_argument("reboot", false) then
 		log.debug("restart")
-		util.execute("sudo csos-reboot" .. (force and " -f" or ""))
+		util.execute("sudo sp-reboot" .. (force and " -f" or ""))
 	end
 	self:renderResult('shutdown.html', strings['shutdown'][language])
 end
