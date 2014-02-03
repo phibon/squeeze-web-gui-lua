@@ -447,8 +447,8 @@ function StorageHandler:_response()
 	t['p_status']      = StorageConfig.status()
 	t['p_disks']       = _ids(StorageConfig.localdisks())
 	t['p_mountpoints'] = _ids(StorageConfig.mountpoints())
-	t['p_types_local'] = _ids({ '', 'vfat', 'ext2', 'ext3', 'ext4' }, true)
-	t['p_types_net']   = _ids({ '', 'cifs' ,'nfs' }, true)
+	t['p_types_local'] = _ids({ '', 'vfat', 'ext2', 'ext3', 'ext4', 'ntfs-3g' }, true)
+	t['p_types_net']   = _ids({ '', 'cifs' ,'nfs', 'nfs4' }, true)
 
 	local umount_str = strings['storage'][language]['unmount']
 
