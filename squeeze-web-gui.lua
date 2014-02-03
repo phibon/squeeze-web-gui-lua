@@ -453,7 +453,7 @@ function StorageHandler:_response()
 	local umount_str = strings['storage'][language]['unmount']
 
 	for _, v in ipairs(StorageConfig.get()) do
-		if v.type ~= 'cifs' and v.type ~= 'nfs' then
+		if v.type ~= 'cifs' and v.type ~= 'nfs' and v.type ~= 'nfs4' then
 			t['p_local'] = t['p_local'] or {}
 			table.insert(t['p_local'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opt, p_perm = v.perm, 
 										 p_unmount = umount_str })
