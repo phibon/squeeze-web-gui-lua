@@ -35,7 +35,7 @@
 <tr>
   <td align="right">{{{timezone}}}<img src='static/tooltip.gif' title="{{{timezone_tip}}}" alt="{{{timezone_tip}}}" /></td>
   <td>
-	<select name="timezone" id="timezone">
+	<select name="timezone" id="timezone" class="size-300px">
 	  {{#p_zones}}
       <option value="{{{zone}}}" {{{selected}}}>{{{zone}}}</option>
 	  {{/p_zones}}
@@ -45,7 +45,7 @@
 <tr>
   <td align="right">{{{locale}}}<img src='static/tooltip.gif' title="{{{locale_tip}}}" alt="{{{locale_tip}}}" /></td>
   <td>
-	<select name="locale" id="locale">
+	<select name="locale" id="locale" class="size-300px">
 	  {{#p_locales}}
       <option value="{{{loc}}}" {{{selected}}}>{{{desc}}}</option>
 	  {{/p_locales}}

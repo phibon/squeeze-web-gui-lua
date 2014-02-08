@@ -257,7 +257,7 @@ function SystemHandler:_response()
 	table.sort(zones)
 	
 	local info = util.capture("ls -l /etc/localtime")
-	local zone = string.match(info, "->%s" .. zonefiles .. "(.-)\n")
+	local zone = string.match(info, zonefiles .. "(.-)\n")
 	
 	t['p_zones'] = {}
 	for _, v in ipairs(zones) do
