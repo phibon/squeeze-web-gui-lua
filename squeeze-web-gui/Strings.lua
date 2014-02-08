@@ -34,8 +34,14 @@ local strings = {
 	['system'] = {
 		['EN'] = {
 			title = "System Configuration",
+			hostname = "Host Name",
 			timezone = "Time Zone",
+			locale = "Locale",
+			hostname_tip = "***",
 			timezone_tip = "***",
+			locale_tip = "***",
+			os_version = "OS Version: ",
+			fedora_version = "Fedora Version: ",
 		},
 	},
 	['network'] = {
@@ -69,6 +75,8 @@ local strings = {
 			domain_tip = "***",
 			essid_tip = "***",
 			wpa_psk_tip = "***",
+			on_boot_tip = "***",
+			dhcp_tip = "***",
 		},
 	},
 	['squeezelite'] = {
@@ -90,6 +98,7 @@ local strings = {
 			vis = "Visulizer", 
 			other = "Other Options",
 			server = "Server IP Address",
+			advanced = "(Advanced)",
 			name_tip = "Set the player name",
 			mac_tip = "Set mac address, format ab:cd:ef:12:34:56",
 			device_tip = "Specify output device",
@@ -105,6 +114,7 @@ local strings = {
 			vis_tip= "***",
 			other_tip = "***",
 			server_tip = "***",
+			advanced_tip = "***",
 		},
 	},
 	['squeezeserver'] = {
@@ -117,10 +127,13 @@ local strings = {
 		['EN'] = {
 			title = "Storage",
 			mounts = "Mounted File Systems",
-			localfs = "Local Disks",
-			netfs = "Network Shares",
+			localfs = "Mount Local Disk",
+			cifs = "Mount Windows Share",
+			nfs = "Mount NFS Share",
 			disk = "Disk",
 			network = "Network",
+			user = "User",
+			pass = "Password",
 			mountpoint = "Mountpoint",
 			type = "Type",
 			options = "Options",

@@ -1,3 +1,13 @@
+<script type="text/javascript">
+function advancedCheck() {
+  if (document.getElementById('advanced_check').checked) {
+    document.getElementById('advanced').style.display = '';
+  } else {
+    document.getElementById('advanced').style.display = 'none';
+  }
+}
+</script>  
+
 <table>
   <tr>
     <td>
@@ -19,7 +29,7 @@
 <table>
 <tr>
 <td>
-  <textarea name="status" cols="100" rows="4" readonly="readonly" id="squeezelite_status">{{{p_status}}}</textarea>
+  <textarea name="status" cols="100" rows="7" readonly="readonly" id="squeezelite_status">{{{p_status}}}</textarea>
 </td>
 </tr>
 <form id="squeezelite_service" name="squeezelite_service" action="/squeezelite.html" method="post">
@@ -54,17 +64,11 @@
 
 <form id="squeezelite_config" name="squeezelite_config" action="/squeezelite.html" method="post">
 <table>
+  <col width="175">
+  <col width="500">
 <tr>
   <td align="right">{{{name}}}<img src='static/tooltip.gif' title="{{{name_tip}}}" alt="{{{name_tip}}}" /></td>
   <td><input type="text" name="name" value="{{{p_name}}}" id="squeezelite_name" class="size-300px"/></td>      
-</tr>
-<tr>
-  <td align="right">{{{mac}}}<img src='static/tooltip.gif' title="{{{mac_tip}}}" alt="{{{mac_tip}}}" /></td>
-  <td><input type="text" name="mac" value="{{{p_mac}}}" id="squeezelite_mac" class="size-300px"/></td>
-</tr>
-<tr>
-  <td />
-  <td><input type="checkbox" name="defaultmac" value="true" id="squeezelite_defaultmac"/>{{{default_mac}}}</td>
 </tr>
 <tr>
   <td align="right">{{{device}}}<img src='static/tooltip.gif' title="{{{device_tip}}}" alt="{{{device_tip}}}" /></td>
@@ -77,34 +81,14 @@
   </td>
 </tr>
 <tr>
+  <td align="right">{{{alsa}}}<img src='static/tooltip.gif' title="{{{alsa_tip}}}" alt="{{{alsa_tip}}}" /></td>
+  <td><input type="text" name="alsa" value="{{{p_alsa}}}" id="squeezelite_alsa" class="size-300px"/></td>
+</tr>
+<tr>
   <td align="right">{{{rate}}}<img src='static/tooltip.gif' title="{{{rate_tip}}}" alt="{{{rate_tip}}}" /></td>
   <td><input type="text" name="rate" value="{{{p_rate}}}" id="squeezelite_rate" class="size-300px"/></td>
 </tr>
 <tr>
-<tr>
-  <td align="right">{{{logfile}}}<img src='static/tooltip.gif' title="{{{logfile_tip}}}" alt="{{{logfile_tip}}}" /></td>
-  <td><input type="text" name="logfile" value="{{{p_logfile}}}" id="squeezelite_logfile" class="size-300px"/></td>
-</tr>
-<tr>
-  <td align="right">{{{loglevel}}}<img src='static/tooltip.gif' title="{{{loglevel_tip}}}" alt="{{{loglevel_tip}}}" /></td>
-  <td><input type="text" name="loglevel" value="{{{p_loglevel}}}" id="squeezelite_loglevel" class="size-300px"/></td>
-</tr>
-<tr>
-  <td align="right">{{{priority}}}<img src='static/tooltip.gif' title="{{{priority_tip}}}" alt="{{{priority_tip}}}" /></td>
-  <td><input type="text" name="priority" value="{{{p_priority}}}" id="squeezelite_priority" class="size-300px"/></td>
-</tr>
-<tr>
-  <td align="right">{{{buffer}}}<img src='static/tooltip.gif' title="{{{buffer_tip}}}" alt="{{{buffer_tip}}}" /></td>
-  <td><input type="text" name="buffer" value="{{{p_buffer}}}" id="squeezelite_buffer" class="size-300px"/></td>
-</tr>
-<tr>
-  <td align="right">{{{codec}}}<img src='static/tooltip.gif' title="{{{codec_tip}}}" alt="{{{codec_tip}}}" /></td>
-  <td><input type="text" name="codec" value="{{{p_codec}}}" id="squeezelite_codec" class="size-300px"/></td>
-</tr>
-<tr>
-  <td align="right">{{{alsa}}}<img src='static/tooltip.gif' title="{{{alsa_tip}}}" alt="{{{alsa_tip}}}" /></td>
-  <td><input type="text" name="alsa" value="{{{p_alsa}}}" id="squeezelite_alsa" class="size-300px"/></td>
-</tr>
 <tr>
   <td align="right">{{{resample}}}<img src='static/tooltip.gif' title="{{{resample_tip}}}" alt="{{{resample_tip}}}" /></td>
   <td>
@@ -122,17 +106,52 @@
 <tr>
   <td align="right">{{{vis}}}<img src='static/tooltip.gif' title="{{{vis_tip}}}" alt="{{{vis_tip}}}" /></td>
   <td>
-	<input type="checkbox" name="vis" value="true" {{{p_vis_checked}}} id="squeezelite_vis class=" />
+	<input type="checkbox" name="vis" value="true" {{{p_vis_checked}}} id="squeezelite_vis" />
   </td>
 </tr>
+  <td align="right">{{{advanced}}}<img src='static/tooltip.gif' title="{{{advanced_tip}}}" alt="{{{advanced_tip}}}" /></td>
+  <td>
+	<input type="checkbox" name="advanced" value="true" {{{p_advanced}}} id="advanced_check" onclick="javascript:advancedCheck();" />
+  </td>
+</tr>
+</table>
+<table id="advanced" {{^p_advanced}} style="display:none" {{/p_advanced}}>
+  <col width="175">
+  <col width="500">
 <tr>
-  <td align="right">{{{other}}}<img src='static/tooltip.gif' title="{{{other_tip}}}" alt="{{{other_tip}}}" /></td>
-  <td><input type="text" name="other" value="{{{p_other}}}" id="squeezelite_other" class="size-300px"/></td>
+  <td align="right">{{{priority}}}<img src='static/tooltip.gif' title="{{{priority_tip}}}" alt="{{{priority_tip}}}" /></td>
+  <td><input type="text" name="priority" value="{{{p_priority}}}" id="squeezelite_priority" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{buffer}}}<img src='static/tooltip.gif' title="{{{buffer_tip}}}" alt="{{{buffer_tip}}}" /></td>
+  <td><input type="text" name="buffer" value="{{{p_buffer}}}" id="squeezelite_buffer" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{codec}}}<img src='static/tooltip.gif' title="{{{codec_tip}}}" alt="{{{codec_tip}}}" /></td>
+  <td><input type="text" name="codec" value="{{{p_codec}}}" id="squeezelite_codec" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{logfile}}}<img src='static/tooltip.gif' title="{{{logfile_tip}}}" alt="{{{logfile_tip}}}" /></td>
+  <td><input type="text" name="logfile" value="{{{p_logfile}}}" id="squeezelite_logfile" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{loglevel}}}<img src='static/tooltip.gif' title="{{{loglevel_tip}}}" alt="{{{loglevel_tip}}}" /></td>
+  <td><input type="text" name="loglevel" value="{{{p_loglevel}}}" id="squeezelite_loglevel" class="size-300px"/></td>
+</tr>
+<tr>
+  <td align="right">{{{mac}}}<img src='static/tooltip.gif' title="{{{mac_tip}}}" alt="{{{mac_tip}}}" /></td>
+  <td><input type="text" name="mac" value="{{{p_mac}}}" id="squeezelite_mac" class="size-300px"/></td>
 </tr>
 <tr>
   <td align="right">{{{server}}}<img src='static/tooltip.gif' title="{{{server_tip}}}" alt="{{{server_tip}}}" /></td>
   <td><input type="text" name="server" value="{{{p_server}}}" id="squeezelite_server" class="size-300px"/></td>
 </tr>
+<tr>
+  <td align="right">{{{other}}}<img src='static/tooltip.gif' title="{{{other_tip}}}" alt="{{{other_tip}}}" /></td>
+  <td><input type="text" name="other" value="{{{p_other}}}" id="squeezelite_other" class="size-300px"/></td>
+</tr>
+</table>
+<table width="500">
 <tr>
   <td colspan="2" align="right">
 	<input type="reset" name="reset" value="{{{reset}}}"/>

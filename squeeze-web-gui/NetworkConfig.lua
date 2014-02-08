@@ -57,7 +57,7 @@ function get(int, is_wireless)
 	end
 
 	if is_wireless then
-		local pskconf = util.capture("sudo csos-keysRead " .. int)
+		local pskconf = util.capture("sudo sp-keysRead " .. int)
 		if pskconf then
 			pskconf = pskconf .. "\n"
 			for line in string.gmatch(pskconf, "(.-)\n") do
@@ -186,7 +186,7 @@ function set(config, int, is_wireless)
 		outconf:close()
 		inconf:close()
 
-		util.execute("sudo csos-ifcfgUpdate " .. configFileTmp .. " " .. int)
+		util.execute("sudo sp-ifcfgUpdate " .. configFileTmp .. " " .. int)
 		util.execute("rm " .. configFileTmp)
 
 		log.debug("wrote and updated config")
@@ -206,7 +206,7 @@ function set(config, int, is_wireless)
 			keys:write("WPA_PSK='" .. (config.wpa_psk or "") .. "'\n")
 			keys:close()
 
-			util.execute("sudo csos-keysUpdate " .. configFileTmp .. " " .. int)
+			util.execute("sudo sp-keysUpdate " .. configFileTmp .. " " .. int)
 			util.execute("rm " .. configFileTmp)
 
 			log.debug("wrote and updated keys")

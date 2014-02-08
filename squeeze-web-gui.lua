@@ -23,6 +23,8 @@
 local turbo = require('turbo')
 local io    = require('io')
 local lfs   = require('lfs')
+local ffi   = require('ffi')
+ffi.cdef[[int fileno(void *)]]
 
 -- globals accessed by required modules
 log   = turbo.log
@@ -62,23 +64,60 @@ local language = 'EN'
 local debug      = arg[1] and arg[1] == '--debug'
 local test_mode  = arg[1] and arg[1] == '--test'
 
-util.execute = function(cmd)
-	if test_mode then
-		log.debug("execute: " .. cmd)
-		return 
+-- process a cmd as a coroutine to reduce chance of blocking, times out after 5 seconds
+local CMD_TIMEOUT = 5000
+
+function _process_cmd(cmd)
+	local fh = io.popen(cmd .. " 2>&1", "r")
+	if fh == nil then
+		return nil
 	end
-	os.execute(cmd)
+
+	local fileno = ffi.C.fileno(fh)
+	local ioloop = turbo.ioloop.instance()
+	local reader, error
+	local chunks = {}
+
+	local to = ioloop:add_timeout(turbo.util.gettimeofday() + CMD_TIMEOUT, function() if error then error() end end)
+
+	coroutine.yield(turbo.async.task(
+		function(cb, arg)
+			reader = function()
+						 local chunk = fh:read(4096)
+						 if chunk == nil then
+							 ioloop:remove_handler(fileno)
+							 ioloop:remove_timeout(to)
+							 fh:close()
+							 cb(arg)
+						 else
+							 chunks[#chunks + 1] = chunk
+						 end
+					 end
+			error  = function()
+						 ioloop:remove_handler(fileno)
+						 cb(arg)
+					 end
+			turbo.ioloop.instance():add_handler(fileno, turbo.ioloop.READ, reader)
+		end
+	))
+
+	return table.concat(chunks)
 end
 
 util.capture = function(cmd)
+	log.debug("capture: " .. cmd)
 	if test_mode then
-		log.debug("capture: " .. cmd)
 		return "capture: " .. cmd
 	end
-	local f = assert(io.popen(cmd, 'r'))
-	local s = assert(f:read('*a'))
-	f:close()
-	return s
+	return _process_cmd(cmd)
+end
+
+util.execute = function(cmd)
+	log.debug("execute: " .. cmd)
+	if test_mode then
+		return
+	end
+	_process_cmd(cmd)
 end
 
 if test_mode then
@@ -171,7 +210,16 @@ end
 ------------------------------------------------------------------------------------------
 
 -- system.html
-local zonefiles = "/usr/share/zoneinfo/"
+local info_files = {
+	hostname       = '/etc/hostname',
+	os_version     = '/etc/csos-release',
+	fedora_version = '/etc/fedora-release',
+}
+
+local localefile  = '/etc/locale.conf'
+local localesfile = '/usr/share/system-config-language/locale-list'
+local zonefiles   = '/usr/share/zoneinfo/'
+local tmpFile     = '/tmp/tmpfile.txt'
 
 function _zones(dir)
 	local attr = lfs.attributes(zonefiles .. (dir or ""))
@@ -196,17 +244,50 @@ end
 
 function SystemHandler:_response()
 	local t = {}
+	
+	for k, v in pairs(info_files) do
+		local file = io.open(v, 'r')
+		if file then
+			t['p_' .. k] = file:read("*l") or ""
+			file:close()
+		end
+	end
+	
 	local zones = _zones()
 	table.sort(zones)
-
+	
 	local info = util.capture("ls -l /etc/localtime")
 	local zone = string.match(info, "->%s" .. zonefiles .. "(.-)\n")
-
+	
 	t['p_zones'] = {}
 	for _, v in ipairs(zones) do
 		table.insert(t['p_zones'], { zone = v, selected = (v == zone and "selected" or "") })
 	end
-
+	
+	local cur_locale
+	local file = io.open(localefile, "r")
+	if file then
+		for line in file:lines() do
+			if string.match(line, "LANG") then
+				cur_locale = string.match(line, 'LANG="(.-)"')
+			end
+		end
+		file:close()
+	end
+	t['p_locale'] = cur_locale
+	
+	t['p_locales'] = {}
+	local file = io.open(localesfile, "r")
+	if file then
+		for line in file:lines() do
+			local locale, desc = string.match(line, "^(.-)%s.-%s.-%s(.*)$")
+			if locale and desc then
+				table.insert(t['p_locales'], { loc = locale, selected = (locale == cur_locale and "selected" or ""), desc = desc })
+			end
+		end
+		file:close()
+	end
+	
 	setmetatable(t, { __index = strings['system'][language] })
 	self:renderResult('system.html', t)
 end
@@ -216,11 +297,36 @@ function SystemHandler:get()
 end
 
 function SystemHandler:post()
+	local hostname = self:get_argument("hostname", false)
+	if hostname then
+		log.debug("setting hostname to " .. hostname)
+		local file = io.open(tmpFile, "w")
+		if file then
+			file:write(hostname .. "\n")
+			file:close()
+			util.execute("sudo sp-hostnameUpdate " .. tmpFile)
+			util.execute("rm " .. tmpFile)
+		end
+	end
+	
 	local newzone = self:get_argument("timezone", false)
 	if newzone then
 		log.debug("setting timezone to " .. newzone)
-		util.execute("sudo csos-timeZone " .. newzone)
+		util.execute("sudo sp-timeZone " .. newzone)
 	end
+	
+	local locale = self:get_argument("locale", false)
+	if hostname then
+		log.debug("setting locale to " .. locale)
+		local file = io.open(tmpFile, "w")
+		if file then
+			file:write('LANG="' .. locale .. '"\n')
+			file:close()
+			util.execute("sudo sp-localeUpdate " .. tmpFile)
+			util.execute("rm " .. tmpFile)
+		end
+	end
+	
 	self:_response()
 end
 
@@ -233,7 +339,9 @@ function NetworkHandler:_response(type, err)
 	local config = NetworkConfig.get(int, is_wireless)
 	local t = {}
 
-	t['p_error'] = err and (strings['squeezelite'][language]["error_" .. err] or 'validation error - ' .. err)
+	if err then
+		t['p_error'] = err and (strings['squeezelite'][language]["error_" .. err] or 'validation error - ' .. err)
+	end
 
 	t['p_iftype'] = type
 	t['p_is_wlan'] = is_wireless
@@ -330,7 +438,9 @@ function SqueezeliteHandler:_response(err)
 	local config = SqueezeliteConfig.get()
 	local t = {}
 
-	t['p_error'] = err and (strings['squeezelite'][language]["error_" .. err] or 'validation error - ' .. err)
+	if err then
+		t['p_error'] = err and (strings['squeezelite'][language]["error_" .. err] or 'validation error - ' .. err)
+	end
 
 	for _, v in ipairs(SqueezeliteConfig.params()) do
 		t["p_"..v] = config[v]
@@ -338,6 +448,7 @@ function SqueezeliteHandler:_response(err)
 	t['p_resample_checked'] = config.resample and "checked" or ""
 	t['p_dop_checked']      = config.dop and "checked" or ""
 	t['p_vis_checked']      = config.vis and "checked" or ""
+	t['p_advanced'] = self:get_argument('advanced', false) and "checked" or nil
 
 	t['p_status'] = util.capture('systemctl status squeezelite.service')
 	if config.logfile then
@@ -411,6 +522,8 @@ function SqueezeserverHandler:_response()
 		p_status = util.capture('systemctl status squeezeboxserver.service')
 	}
 
+	t['p_server_url'] = 'http://' .. string.gsub(self.request['host'], tostring(PORT), 9000)
+
 	local logfile = io.open("/var/log/squeezeboxserver/server.log", "r")
 	if logfile then
 		logfile:close()
@@ -441,27 +554,25 @@ function _ids(tab)
 	return t
 end
 
-function StorageHandler:_response()
+function StorageHandler:_response(err, etype)
 	local t = {}
+
+	if err and err ~= "" then
+		log.debug("error: " .. etype .. " " .. err)
+		t['p_error_' .. etype] = err
+	end
 
 	t['p_status']      = StorageConfig.status()
 	t['p_disks']       = _ids(StorageConfig.localdisks())
 	t['p_mountpoints'] = _ids(StorageConfig.mountpoints())
-	t['p_types_local'] = _ids({ '', 'vfat', 'ext2', 'ext3', 'ext4' }, true)
-	t['p_types_net']   = _ids({ '', 'cifs' ,'nfs' }, true)
+	t['p_types_local'] = _ids({ '', 'fat', 'ntfs', 'ext2', 'ext3', 'ext4' })
+	t['p_types_nfs']   = _ids({ '', 'nfs', 'nfs4' })
 
 	local umount_str = strings['storage'][language]['unmount']
 
 	for _, v in ipairs(StorageConfig.get()) do
-		if v.type ~= 'cifs' and v.type ~= 'nfs' then
-			t['p_local'] = t['p_local'] or {}
-			table.insert(t['p_local'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opt, p_perm = v.perm, 
-										 p_unmount = umount_str })
-		else
-			t['p_net'] = t['p_net'] or {}
-			table.insert(t['p_net'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opt, p_perm = v.perm,
-									   p_unmount = umount_str })
-		end
+		t['p_mounts'] = t['p_mounts'] or {}
+		table.insert(t['p_mounts'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opt, p_perm = v.perm, p_unmount_str = umount_str })
 	end
 
 	setmetatable(t, { __index = strings['storage'][language] })
@@ -477,24 +588,54 @@ function StorageHandler:post()
 	local mountp = self:get_argument('mountpoint', false)
 	local type = self:get_argument('type', false)
 	local opts = self:get_argument('options', false)
+	local err, etype
 
-	if self:get_argument('localfs_mount', false) or self:get_argument('netfs_mount', false) then
-		util.execute("sudo umount " .. mountp)
-		util.execute("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (opts and ("-o " .. opts .. " ") or "") ..
-					 spec .. " " .. mountp)
-		-- if mount worked then persist, storing opts passed not those parsed from active mounts
-		local mounts = StorageConfig.get()
-		for _, v in ipairs(mounts) do
-			if spec == v.spec and mountp == v.mountp then
-				v.opts = opts
-				v.perm = true
-				break
-			end
+	local type_map = { fat = 'vfat', ntfs = 'ntfs-3g' }
+	opts = type_map[opts] or opts
+
+	local new_local = self:get_argument('localfs_mount', false)
+	local new_cifs  = self:get_argument('cifs_mount', false)
+	local new_nfs   = self:get_argument('nfs_mount', false)
+
+	if new_cifs then
+		-- for cifs we must make sure that either pass or guest is added to the option string else mount.cifs may block
+		local user = self:get_argument('user', false)
+		local pass = self:get_argument('pass', false)
+		opts = opts or ""
+		if user then
+			opts = opts .. (opts ~= "" and "," or "") .. "user=" .. user
 		end
-		StorageConfig.set(mounts)
+		if pass then
+			opts = opts .. (opts ~= "" and "," or "") .. "pass=" .. pass
+		else
+			opts = opts .. (opts ~= "" and "," or "") .. "guest"
+		end
+		type = 'cifs'
 	end
 
-	if self:get_argument('localfs_unmount', false) or self:get_argument('net_unmount', false) then
+	if new_local or new_cifs or new_nfs then
+		util.execute("sudo umount " .. mountp)
+		err = util.capture("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (opts and ("-o " .. opts .. " ") or "") ..
+						   spec .. " " .. mountp)
+		-- if mount worked then persist, storing opts passed not those parsed from active mounts
+		if not err or err == "" then
+			local mounts = StorageConfig.get()
+			for _, v in ipairs(mounts) do
+				if spec == v.spec and mountp == v.mountp then
+					v.opts = opts
+				v.perm = true
+					break
+				end
+			end
+			StorageConfig.set(mounts)
+		else
+			if new_local then etype = 'localfs' end
+			if new_cifs  then etype = 'cifs' end
+			if new_nfs   then etype = 'nfs' end
+		end
+	end
+
+	if self:get_argument('mounts_unmount', false) and mountp then
 		util.execute("sudo umount " .. mountp)
 		-- remove mount from persited mounts
 		local mounts = StorageConfig.get()
@@ -509,7 +650,7 @@ function StorageHandler:post()
 		StorageConfig.set(mounts)
 	end
 
-	self:_response()
+	self:_response(err, etype)
 end
 
 ------------------------------------------------------------------------------------------
@@ -523,11 +664,11 @@ function ShutdownHandler:post()
 	local force = self:get_argument("force", false)
 	if self:get_argument("halt", false) then
 		log.debug("halt")
-		util.execute("sudo csos-halt" .. (force and " -f" or ""))
+		util.execute("sudo sp-halt" .. (force and " -f" or ""))
 	end
 	if self:get_argument("reboot", false) then
 		log.debug("restart")
-		util.execute("sudo csos-reboot" .. (force and " -f" or ""))
+		util.execute("sudo sp-reboot" .. (force and " -f" or ""))
 	end
 	self:renderResult('shutdown.html', strings['shutdown'][language])
 end

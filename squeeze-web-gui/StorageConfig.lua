@@ -131,7 +131,7 @@ function set(mounts)
 		tmp:close()
 		fstab:close()
 
-		util.execute("sudo csos-fstabUpdate " .. fstabTmp)
+		util.execute("sudo sp-fstabUpdate " .. fstabTmp)
 		util.execute("rm " .. fstabTmp)
 
 		log.debug("wrote and updated fstab")

@@ -11,12 +11,27 @@
   </tr>
 </table>
 
+<table>
+<tr>
+  <td align="right" >{{{os_version}}}</td>
+  <td>{{{p_os_version}}}</td>
+</tr>
+<tr>
+  <td align="right" >{{{fedora_version}}}</td>
+  <td>{{{p_fedora_version}}}</td>
+</tr>
+</table>
+
 <hr />
 
-<h4>{{{timezone}}}</h4>
+<h4>{{{configuration}}}</h4>
 
 <form id="system" name="system" action="/system.html" method="post">
 <table>
+<tr>
+  <td align="right">{{{hostname}}}<img src='static/tooltip.gif' title="{{{hostname_tip}}}" alt="{{{hostname_tip}}}" /></td>
+  <td><input type="text" name="hostname" value="{{{p_hostname}}}" id="hostname" class="size-300px"/></td>
+</tr>
 <tr>
   <td align="right">{{{timezone}}}<img src='static/tooltip.gif' title="{{{timezone_tip}}}" alt="{{{timezone_tip}}}" /></td>
   <td>
@@ -27,6 +42,17 @@
 	</select>
   </td>
 </tr>
+<tr>
+  <td align="right">{{{locale}}}<img src='static/tooltip.gif' title="{{{locale_tip}}}" alt="{{{locale_tip}}}" /></td>
+  <td>
+	<select name="locale" id="locale">
+	  {{#p_locales}}
+      <option value="{{{loc}}}" {{{selected}}}>{{{desc}}}</option>
+	  {{/p_locales}}
+	</select>
+  </td>
+</tr>
+
 <tr>
   <td colspan="2" align="right">
 	<input type="reset" name="reset" value="{{{reset}}}"/>

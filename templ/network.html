@@ -72,11 +72,11 @@ function dhcpCheck() {
 </tr>
 {{/p_is_wlan}}
 <tr>
-  <td align="right">{{{on_boot}}}</td>
+  <td align="right">{{{on_boot}}}<img src='static/tooltip.gif' title="{{{on_boot_tip}}}" alt="{{{on_boot_tip}}}" /></td>
   <td><input type="checkbox" id="onboot" name="onboot" value="true" {{{p_onboot_checked}}}></td>
 </tr>
 <tr>
-  <td align="right">{{{dhcp}}}</td>
+  <td align="right">{{{dhcp}}}<img src='static/tooltip.gif' title="{{{dhcp_tip}}}" alt="{{{dhcp_tip}}}" /></td>
   <td><input type="checkbox" id="dhcp" name="dhcp" value="true" {{{p_dhcp_checked}}} onclick="javascript:dhcpCheck();"></td>
 </tr>
 

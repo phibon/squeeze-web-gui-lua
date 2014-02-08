@@ -152,11 +152,23 @@ a img {
 }
 
 .max-width {
-	width: 100%;
+  width: 100%;
 }
 
 .size-300px  {
   width: 300px;
+}
+
+.size-225px  {
+  width: 225px;
+}
+
+.size-200px  {
+  width: 200px;
+}
+
+.size-150px  {
+  width: 150px;
 }
 
 .size-100px  {
