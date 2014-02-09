@@ -33,7 +33,8 @@ util  = {}
 local NetworkConfig     = require('squeeze-web-gui.NetworkConfig')
 local SqueezeliteConfig = require('squeeze-web-gui.SqueezeliteConfig')
 local StorageConfig     = require('squeeze-web-gui.StorageConfig')
-local strings           = require("squeeze-web-gui.Strings")
+
+local strings, language
 
 ------------------------------------------------------------------------------------------
 
@@ -54,9 +55,21 @@ local static_path = path .. '/static/'
 local eth_id  = "eth0"
 local wlan_id = "wlan0"
 
--- languages supported and default
-local languages = { 'EN', 'DE' }
-local language = 'EN'
+-- languages supported
+local languages = { EN = true, DE = true, }
+
+-- skin branding
+local skin = {
+	brand_name = "Open Squeeze",
+	logo_small = "static/os-logo-146x50.png",
+	logo_small_alt = "Logo (small)",
+	logo_small_width = "146",
+	logo_small_height = "50",
+	logo_large = "static/os-logo-541x288.png",
+	logo_large_alt = "Logo (large)",
+	logo_large_width = "541",
+	logo_large_height = "288",
+}
 
 ------------------------------------------------------------------------------------------
 
@@ -120,20 +133,77 @@ util.execute = function(cmd)
 	_process_cmd(cmd)
 end
 
-if test_mode then
-	-- log string misses, excluded params which start with p_
-	local func = function(t, str) 
-					 if not string.match(str, "^p_") then
-						 log.debug("missing string [" .. language .. "]: " .. str)
-					 end
-				 end
-	setmetatable(strings['base'][language], { __index = func })
-end
-
 if not debug and not test_mode then
 	log.categories.debug   = false
 	log.categories.success = false
 end
+
+-- cached param and strings table for footer
+local footer_t = { release = release }
+
+------------------------------------------------------------------------------------------
+
+-- strings
+local stringsPrefix = "squeeze-web-gui/Strings-"
+local prefsFile     = os.getenv("HOME") .. "/.squeeze-web-gui.lang"
+
+function get_language()
+	local file = io.open(prefsFile, "r")
+	local lang
+	if file then
+		lang = file:read("*l")
+		file:close()
+	end
+	if languages[lang] then
+		return lang
+	end
+end
+
+function set_language(lang)
+	local file = io.open(prefsFile, "w")
+	if file then
+		file:write(lang .. "\n")
+		file:close()
+	end
+end
+
+function load_strings(lang)
+	local path = package.path .. ";"
+	for loc in string.gmatch(package.path, "(.-);") do
+		local file = string.gsub(loc, "%?", stringsPrefix .. lang) do
+			local f, err = loadfile(file)
+			if f then
+				setfenv(f, {})
+				strings = f()
+				break
+			end
+		end
+	end
+
+	-- add metamethods so categories fallback to base within same language
+	for section, _ in pairs(strings) do
+		if section ~= 'base' and section ~= 'languages' then
+			setmetatable(strings[section], { __index = strings['base'] })
+		end
+	end
+
+	setmetatable(strings['base'], { __index = skin })
+	setmetatable(footer_t, { __index = strings['footer'] })
+
+	if test_mode then
+		-- log string misses, excluded params which start with p_
+		local func = function(t, str) 
+						 if not string.match(str, "^p_") then
+							 log.debug("missing string [" .. language .. "]: " .. str)
+						 end
+					 end
+		setmetatable(skin, { __index = func })
+	end
+end
+
+language = get_language() or 'EN'
+
+load_strings(language)
 
 ------------------------------------------------------------------------------------------
 
@@ -141,10 +211,6 @@ end
 local templ = turbo.web.Mustache.TemplateHelper(templ_path)
 
 local PageHandler = class("PageHandler", turbo.web.RequestHandler)
-
--- cached param and strings table for footer
-local footer_t = { release = release }
-setmetatable(footer_t, { __index = strings['footer'][language] })
 
 -- common actions
 local service_actions = {
@@ -159,7 +225,7 @@ local service_actions = {
 }
 
 function PageHandler:renderResult(template, t)
-	self:write( templ:render('header.html', strings['header'][language]) )
+	self:write( templ:render('header.html', strings['header']) )
 	self:write( templ:render(template, t) )
 	self:write( templ:render('footer.html', footer_t) )
 end
@@ -191,19 +257,21 @@ local HelpHandler        = class("HelpHandler", PageHandler)
 -- index.html
 function IndexHandler:get()
 	local lang = self:get_argument('locale', false)
-	if lang and strings['languages'][lang] then
+	if lang and languages[lang] then
+		log.debug("set language: " .. lang)
+		load_strings(lang)
+		set_language(lang)
 		language = lang
-		setmetatable(footer_t, { __index = strings['footer'][language] })
 	end
 
 	local t = { p_languages = {}, p_eth_id = eth_id, p_wlan_id = wlan_id }
 
 	local l = t['p_languages']
-	for _, v in ipairs(languages) do
-		l[#l+1] = { lang = v, desc = strings['languages'][v], selected = (v == language and "selected" or "") }
+	for k, _ in pairs(languages) do
+		l[#l+1] = { lang = k, desc = strings['languages'][k], selected = (k == language and "selected" or "") }
 	end
 
-	setmetatable(t, { __index = strings['index'][language] })
+	setmetatable(t, { __index = strings['index'] })
 	self:renderResult('index.html', t)
 end
 
@@ -288,7 +356,7 @@ function SystemHandler:_response()
 		file:close()
 	end
 	
-	setmetatable(t, { __index = strings['system'][language] })
+	setmetatable(t, { __index = strings['system'] })
 	self:renderResult('system.html', t)
 end
 
@@ -340,7 +408,7 @@ function NetworkHandler:_response(type, err)
 	local t = {}
 
 	if err then
-		t['p_error'] = err and (strings['squeezelite'][language]["error_" .. err] or 'validation error - ' .. err)
+		t['p_error'] = err and (strings['squeezelite']["error_" .. err] or 'validation error - ' .. err)
 	end
 
 	t['p_iftype'] = type
@@ -371,10 +439,10 @@ function NetworkHandler:_response(type, err)
 			table.insert(t['p_essids'], 1, { id = config.essid, selected = "selected" })
 		end
 		-- add option to add private network
-		table.insert(t['p_essids'], { id = strings['network'][language]['add_private'] })
+		table.insert(t['p_essids'], { id = strings['network']['add_private'] })
 	end
 
-	setmetatable(t, { __index = strings['network'][language] })
+	setmetatable(t, { __index = strings['network'] })
 	self:renderResult('network.html', t)
 end
 
@@ -439,7 +507,7 @@ function SqueezeliteHandler:_response(err)
 	local t = {}
 
 	if err then
-		t['p_error'] = err and (strings['squeezelite'][language]["error_" .. err] or 'validation error - ' .. err)
+		t['p_error'] = err and (strings['squeezelite']["error_" .. err] or 'validation error - ' .. err)
 	end
 
 	for _, v in ipairs(SqueezeliteConfig.params()) do
@@ -480,7 +548,7 @@ function SqueezeliteHandler:_response(err)
 		table.insert(t['p_devices'], 1, { device = config.device, selected = "selected" })
 	end
 
-	setmetatable(t, { __index = strings['squeezelite'][language] })
+	setmetatable(t, { __index = strings['squeezelite'] })
 	self:renderResult('squeezelite.html', t)
 end
 
@@ -530,7 +598,7 @@ function SqueezeserverHandler:_response()
 		t['p_status'] = t['p_status'] .. util.capture('tail /var/log/squeezeboxserver/server.log')
 	end
 
-	setmetatable(t, { __index = strings['squeezeserver'][language] })
+	setmetatable(t, { __index = strings['squeezeserver'] })
 	self:renderResult('squeezeserver.html', t)
 end
 
@@ -568,14 +636,14 @@ function StorageHandler:_response(err, etype)
 	t['p_types_local'] = _ids({ '', 'fat', 'ntfs', 'ext2', 'ext3', 'ext4' })
 	t['p_types_nfs']   = _ids({ '', 'nfs', 'nfs4' })
 
-	local umount_str = strings['storage'][language]['unmount']
+	local umount_str = strings['storage']['unmount']
 
 	for _, v in ipairs(StorageConfig.get()) do
 		t['p_mounts'] = t['p_mounts'] or {}
 		table.insert(t['p_mounts'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opt, p_perm = v.perm, p_unmount_str = umount_str })
 	end
 
-	setmetatable(t, { __index = strings['storage'][language] })
+	setmetatable(t, { __index = strings['storage'] })
 	self:renderResult('storage.html', t)
 end
 
@@ -657,7 +725,7 @@ end
 
 -- shutdown.html
 function ShutdownHandler:get()
-	self:renderResult('shutdown.html', strings['shutdown'][language])
+	self:renderResult('shutdown.html', strings['shutdown'])
 end
 
 function ShutdownHandler:post()
@@ -670,21 +738,21 @@ function ShutdownHandler:post()
 		log.debug("restart")
 		util.execute("sudo sp-reboot" .. (force and " -f" or ""))
 	end
-	self:renderResult('shutdown.html', strings['shutdown'][language])
+	self:renderResult('shutdown.html', strings['shutdown'])
 end
 
 ------------------------------------------------------------------------------------------
 
 -- faq.html
 function FaqHandler:get()
-	self:renderResult('faq.html', strings['faq'][language])
+	self:renderResult('faq.html', strings['faq'])
 end
 
 ------------------------------------------------------------------------------------------
 
 -- help.html
 function HelpHandler:get()
-	self:renderResult('help.html', strings['help'][language])
+	self:renderResult('help.html', strings['help'])
 end
 
 ------------------------------------------------------------------------------------------
