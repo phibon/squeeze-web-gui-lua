@@ -32,7 +32,6 @@ function advancedCheck() {
   <textarea name="status" cols="100" rows="7" readonly="readonly" id="squeezelite_status">{{{p_status}}}</textarea>
 </td>
 </tr>
-<form id="squeezelite_service" name="squeezelite_service" action="/squeezelite.html" method="post">
 <tr>
 <td align="right">
   <input type="submit" id="refresh" name="refresh" value="{{refresh}}"/>
@@ -109,6 +108,7 @@ function advancedCheck() {
 	<input type="checkbox" name="vis" value="true" {{{p_vis_checked}}} id="squeezelite_vis" />
   </td>
 </tr>
+<tr>
   <td align="right">{{{advanced}}}<img src='static/tooltip.gif' title="{{{advanced_tip}}}" alt="{{{advanced_tip}}}" /></td>
   <td>
 	<input type="checkbox" name="advanced" value="true" {{{p_advanced}}} id="advanced_check" onclick="javascript:advancedCheck();" />
