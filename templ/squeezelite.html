@@ -63,8 +63,6 @@ function advancedCheck() {
 
 <form id="squeezelite_config" name="squeezelite_config" action="/squeezelite.html" method="post">
 <table>
-  <col width="175">
-  <col width="500">
 <tr>
   <td align="right">{{{name}}}<img src='static/tooltip.gif' title="{{{name_tip}}}" alt="{{{name_tip}}}" /></td>
   <td><input type="text" name="name" value="{{{p_name}}}" id="squeezelite_name" class="size-300px"/></td>      
@@ -109,15 +107,20 @@ function advancedCheck() {
   </td>
 </tr>
 <tr>
+<!--
   <td align="right">{{{advanced}}}<img src='static/tooltip.gif' title="{{{advanced_tip}}}" alt="{{{advanced_tip}}}" /></td>
+-->
+  <td />
   <td>
 	<input type="checkbox" name="advanced" value="true" {{{p_advanced}}} id="advanced_check" onclick="javascript:advancedCheck();" />
+	{{{advanced}}}
   </td>
 </tr>
-</table>
+
+<!-- Start: Advanced Options -->
+<tr>
+<td colspan="2">
 <table id="advanced" {{^p_advanced}} style="display:none" {{/p_advanced}}>
-  <col width="175">
-  <col width="500">
 <tr>
   <td align="right">{{{priority}}}<img src='static/tooltip.gif' title="{{{priority_tip}}}" alt="{{{priority_tip}}}" /></td>
   <td><input type="text" name="priority" value="{{{p_priority}}}" id="squeezelite_priority" class="size-300px"/></td>
@@ -151,7 +154,10 @@ function advancedCheck() {
   <td><input type="text" name="other" value="{{{p_other}}}" id="squeezelite_other" class="size-300px"/></td>
 </tr>
 </table>
-<table width="500">
+</td>
+</tr>
+<!-- End: Advanced Options -->
+
 <tr>
   <td colspan="2" align="right">
 	<input type="reset" name="reset" value="{{{reset}}}"/>
@@ -164,5 +170,5 @@ function advancedCheck() {
   </td>
 </tr>
 </table>
-</form>
 
+</form>

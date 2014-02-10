@@ -69,7 +69,7 @@ return {
 		vis = "Visulizer", 
 		other = "Other Options",
 		server = "Server IP Address",
-		advanced = "(Advanced)",
+		advanced = "Show Advanced Options",
 		name_tip = "Set the player name",
 		mac_tip = "Set mac address, format ab:cd:ef:12:34:56",
 		device_tip = "Specify output device",
