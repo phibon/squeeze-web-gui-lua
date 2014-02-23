@@ -239,6 +239,8 @@ legend {
   margin: 2px;
 }
 .entry-nomargin {
+}
+.smaller {
   font-size: smaller;
 }
 .label {
@@ -281,7 +283,7 @@ legend {
 }
 .log {
   width: 98%;
-  height: 100px;
+  height: 200px;
   margin: 5px;
   padding: 5px;
 }
