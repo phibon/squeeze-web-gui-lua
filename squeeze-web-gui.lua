@@ -337,6 +337,26 @@ function _zones(dir)
 	return t
 end
 
+function _sambaconf()
+	local file = io.open('/etc/samba/smb.conf', 'r')
+	local name, group
+	if file then
+		for line in file:lines() do
+			local n =  string.match(line, "%s*netbios%s*name%s*=%s*(.-)%s*$")
+			local g = string.match(line, "workgroup%s*=%s*(.-)%s*$")
+			if n then
+				name = string.match(n, '^"(.-)"$') or n
+			end
+			if g then
+				group =	string.match(g, '^"(.-)"$') or g
+			end
+		end
+		file:close()
+	end
+
+	return name, group
+end
+
 function SystemHandler:_response()
 	local t = {}
 	
@@ -384,7 +404,9 @@ function SystemHandler:_response()
 		end
 		file:close()
 	end
-	
+
+	t['p_nb_name'], t['p_nb_group'] = _sambaconf()
+
 	setmetatable(t, { __index = strings['system'] })
 	self:renderResult('system.html', t)
 end
@@ -422,6 +444,19 @@ function SystemHandler:post()
 			util.execute("sudo sp-localeUpdate " .. tmpFile)
 			util.execute("rm " .. tmpFile)
 		end
+	end
+
+	local name  = self:get_argument("nb_name", false)
+	local group = self:get_argument("nb_group", false)
+
+	local cur_name, cur_group = _sambaconf()
+
+	if name and name ~= cur_name then
+		util.execute("sudo sp-sambaConfigNetbiosName " .. name)
+	end
+
+	if group and group ~= cur_group then
+		util.execute("sudo sp-sambaConfigWorkgroup " .. group)
 	end
 	
 	self:_response()
