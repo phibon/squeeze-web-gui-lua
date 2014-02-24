@@ -29,17 +29,17 @@ local fstabLocation = "/etc/fstab"
 local tmpFile       = "/tmp/conf.tmp"
 
 local local_disks   = "/dev/"
-local mount_root    = "/storage"
 
 function _mounts()
 	local mounts = {}
 
-	local cap = util.capture('mount | grep ' .. mount_root)
-	cap = cap .. "\n"
+	local cap = util.capture('mount') .. "\n"
 	for line in string.gmatch(cap, "(.-)\n") do
-		local spec, mountp, type, opts = string.match(line, "(.-) on (.-) type (.-) %((.-)%)")
-		if spec and mountp and type and opts then
-			mounts[#mounts+1] = { spec = spec, mountp = mountp, type = type, opts = opts, perm = false } 
+		if string.match(line, "/storage") or string.match(line, "/mnt/disk") then
+			local spec, mountp, type, opts = string.match(line, "(.-) on (.-) type (.-) %((.-)%)")
+			if spec and mountp and type and opts then
+				mounts[#mounts+1] = { spec = spec, mountp = mountp, type = type, opts = opts, perm = false } 
+			end
 		end
 	end
 	return mounts
@@ -85,18 +85,12 @@ function get()
 end
 
 function mountpoints()
-	local available_mounts = { "/storage", "/storage/disk1", "/storage/disk2", "/storage/disk3", "/storage/disk4" }
+	local available_mounts = { "/storage", "/mnt/disk1", "/mnt/disk2", "/mnt/disk3", "/mnt/disk4", "/mnt/disk5" }
 	local exclude, t = {}, {}
 
 	-- only show available mounts
 	for _, mount in ipairs(_mounts()) do
 		exclude[mount.mountp] = true
-		if mount.mountp == '/storage' then
-			available_mounts = {}
-			break
-		else
-			exclude['/storage'] = true
-		end
 	end
 	for _, v in ipairs(available_mounts) do
 	    if not exclude[v] then
@@ -162,7 +156,7 @@ end
 
 function cred_file(mountp, user, pass, domain)
 	local credFile = 'cifs' .. string.gsub(mountp, "/", "-")
-
+	
 	local tmp = io.open(tmpFile, "w")
 	if tmp then
 		tmp:write("# Created by squeez-web-gui-lua\n")
@@ -170,14 +164,14 @@ function cred_file(mountp, user, pass, domain)
 		tmp:write("password=" .. (pass or "") .. "\n")
 		tmp:write("domain=" .. (domain or "") .. "\n")
 		tmp:close()
-
+		
 		util.execute("sudo sp-credentialsUpdate " .. tmpFile .. " " .. credFile)
 		util.execute("rm " .. tmpFile)
-
+		
 		log.debug("updated credentials " .. credFile)
 	else
 		log.error("unable to open: " .. tmpFile)
 	end
-
+	
 	return '/etc/credentials/' .. credFile
 end

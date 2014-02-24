@@ -750,15 +750,15 @@ function StorageHandler:post()
 	local type = self:get_argument('type', false)
 	local opts = self:get_argument('options', false)
 	local err
-
+	
 	local type_map = { fat = 'vfat', ntfs = 'ntfs-3g' }
 	type = type_map[type] or type
-
+	
 	local new_local = self:get_argument('localfs_mount', false)
 	local new_remote= self:get_argument('remotefs_mount', false)
-
+	
 	if new_remote and type == 'cifs' then
-		-- for cifs we must make sure that either pass or guest is added to the option string else mount.cifs may block
+		-- for cifs we must make sure that either credentials or guest is added to the option string else mount.cifs may block
 		local user = self:get_argument('user', false)
 		local pass = self:get_argument('pass', false)
 		local domain = self:get_argument('domain', false)
@@ -769,7 +769,7 @@ function StorageHandler:post()
 			opts = opts .. (opts ~= "" and "," or "") .. "guest"
 		end
 	end
-
+	
 	if new_local or new_remote then
 		err = util.capture("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (opts and ("-o " .. opts .. " ") or "") ..
 						   spec .. " " .. mountp)
@@ -779,14 +779,14 @@ function StorageHandler:post()
 			for _, v in ipairs(mounts) do
 				if spec == v.spec and mountp == v.mountp then
 					v.opts = opts
-				v.perm = true
+					v.perm = true
 					break
 				end
 			end
 			StorageConfig.set(mounts)
 		end
 	end
-
+	
 	if self:get_argument('mounts_unmount', false) and mountp then
 		util.execute("sudo umount " .. mountp)
 		-- remove mount from persited mounts
@@ -801,7 +801,7 @@ function StorageHandler:post()
 		end
 		StorageConfig.set(mounts)
 	end
-
+	
 	self:_response(err)
 end
 
