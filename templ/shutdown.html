@@ -1,48 +1,49 @@
-<table>
-  <tr>
-    <td>
-	  <a href="/shutdown.html"><img src="{{{logo_small}}}" 
-	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
-	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
-    </td>
-    <td>
-      <h2>{{{title}}}</h2>
-    </td>
-  </tr>
-</table>
+<div class="title-block">
+  <a href="/shutdown.html">
+	<div class="title-image">
+	  <img src="{{{logo_small}}}" alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+		   width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" />
+	</div>
+  </a>
+  <div class="title">{{{title}}}</div>
+</div>
 
-<hr />
+<div>
+  
+  {{{#context}}}
+  <div class="help curved container" id="context" style="display: none">
+	<div class="help-title">
+	  {{{help}}}
+	</div>
+	<div class="help-text">
+	  {{{context}}}
+	</div>
+  </div>
+  {{{/context}}}
+  
+  <div class="config">
+	
+	<form id="system" name="system" action="/shutdown.html" method="post">
+	  <fieldset>
+		<legend >{{{reboot}}}</legend>
+		<div class="entry">{{{reboot_desc}}}</div>
+	  </fieldset>
+	  <fieldset>
+		<div class="entry submit" id=>
+		  <input type="submit" id="reboot" name="reboot" value="{{{reboot}}}"/>
+		</div>
+	  </fieldset>
+	  <fieldset>
+		<legend>{{{halt}}}</legend>
+		<div class="entry">{{{halt_desc}}}</div>
+	  </fieldset>
+	  <fieldset>
+		<div class="entry submit" id=>
+		  <input type="submit" id="halt" name="halt" value="{{{halt}}}"/>
+		</div>
+	  </fieldset>
+	</form>
 
-<h4>{{{control}}}</h4>
+  </div>	
 
-<form id="shutdown" name="shutdown" action="/shutdown.html" method="post">
-<table>
-<tr>
-  <td align="right">
-	<input type="submit" id="halt" name="halt" value="{{{halt}}}"/>
-  </td>
-  <td>
-	{{{halt_desc}}}
-  </td>
-</tr>
-<tr>
-  <td align="right">
-	<input type="submit" id="reboot" name="reboot" value="{{{reboot}}}"/>
-  </td>
-  <td>
-	{{{reboot_desc}}}
-  </td>
-<tr>
-  <td>&nbsp;</td>
-  <td>&nbsp;</td>
-</tr>
-<tr>
-  <td align="right">
-	<input type="checkbox" name="force" value="true" id="force"/>
-  </td>
-  <td>
-	{{{force_desc}}}
-  </td>
-</tr>
-</table>
-</form>
+</div>

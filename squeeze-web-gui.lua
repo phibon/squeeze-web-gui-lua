@@ -77,10 +77,12 @@ local skin = {
 local debug      = arg[1] and arg[1] == '--debug'
 local test_mode  = arg[1] and arg[1] == '--test'
 
--- process a cmd as a coroutine to reduce chance of blocking, times out after 5 seconds
-local CMD_TIMEOUT = 5000
+-- execute a process and capture output using coroutines to reduce chance of blocking with streaming of output to sink
+-- timeout after 5 seconds or 30 mins if passed a request which will normally handle closing itself
+local CMD_TIMEOUT_NORMAL  = 5 * 1000
+local CMD_TIMEOUT_PERSIST = 30 * 60 * 1000
 
-function _process_cmd(cmd)
+function _process_cmd(cmd, sink, request)
 	local fh = io.popen(cmd .. " 2>&1", "r")
 	if fh == nil then
 		return nil
@@ -88,33 +90,51 @@ function _process_cmd(cmd)
 
 	local fileno = ffi.C.fileno(fh)
 	local ioloop = turbo.ioloop.instance()
-	local reader, error
+	local chunksize = sink and "*l" or 4096
+	local timeout = request and CMD_TIMEOUT_PERSIST or CMD_TIMEOUT_NORMAL
+	local reader, close, forceclose
 	local chunks = {}
 
-	local to = ioloop:add_timeout(turbo.util.gettimeofday() + CMD_TIMEOUT, function() if error then error() end end)
+	local to = ioloop:add_timeout(turbo.util.gettimeofday() + timeout, function() forceclose() end)
 
 	coroutine.yield(turbo.async.task(
 		function(cb, arg)
 			reader = function()
-						 local chunk = fh:read(4096)
+						 local chunk = fh:read(chunksize)
+						 if sink then
+							 sink(chunk)
+						 end
 						 if chunk == nil then
-							 ioloop:remove_handler(fileno)
-							 ioloop:remove_timeout(to)
-							 fh:close()
-							 cb(arg)
+							 close()
 						 else
 							 chunks[#chunks + 1] = chunk
 						 end
 					 end
-			error  = function()
+			close  = function()
 						 ioloop:remove_handler(fileno)
+						 ioloop:remove_timeout(to)
+						 fh:close()
+						 if request then
+							 request.__stream_close = nil
+						 end
 						 cb(arg)
 					 end
+			forceclose = function()
+							 -- popen waits for the process to finish, so kill it
+							 log.debug("killing process: " .. cmd)
+							 os.execute("pkill -f " .. '"' .. cmd .. '"')
+							 close()
+						 end
+			if request then
+				request.__stream_close = forceclose
+			end
 			turbo.ioloop.instance():add_handler(fileno, turbo.ioloop.READ, reader)
 		end
 	))
 
-	return table.concat(chunks)
+	if not sink then
+		return table.concat(chunks)
+	end
 end
 
 util.capture = function(cmd)
@@ -131,6 +151,11 @@ util.execute = function(cmd)
 		return
 	end
 	_process_cmd(cmd)
+end
+
+util.stream = function(cmd, sink, request)
+	log.debug("streaming cmd: " .. cmd)
+	_process_cmd(cmd, sink, request)
 end
 
 if not debug and not test_mode then
@@ -225,7 +250,9 @@ local service_actions = {
 }
 
 function PageHandler:renderResult(template, t)
-	self:write( templ:render('header.html', strings['header']) )
+	local header_t = { context = t['context'] }
+	setmetatable(header_t, { __index = strings['header'] })
+	self:write( templ:render('header.html', header_t ) )
 	self:write( templ:render(template, t) )
 	self:write( templ:render('footer.html', footer_t) )
 end
@@ -250,7 +277,7 @@ local SqueezeserverHandler = class("SqueezeserverHandler", PageHandler)
 local StorageHandler     = class("StorageHandler", PageHandler)
 local ShutdownHandler    = class("ShutdownHandler", PageHandler)
 local FaqHandler         = class("FaqHandler", PageHandler)
-local HelpHandler        = class("HelpHandler", PageHandler)
+local LogHandler         = class("LogHandler", turbo.web.RequestHandler)
 
 ------------------------------------------------------------------------------------------
 
@@ -310,6 +337,26 @@ function _zones(dir)
 	return t
 end
 
+function _sambaconf()
+	local file = io.open('/etc/samba/smb.conf', 'r')
+	local name, group
+	if file then
+		for line in file:lines() do
+			local n =  string.match(line, "%s*netbios%s*name%s*=%s*(.-)%s*$")
+			local g = string.match(line, "workgroup%s*=%s*(.-)%s*$")
+			if n then
+				name = string.match(n, '^"(.-)"$') or n
+			end
+			if g then
+				group =	string.match(g, '^"(.-)"$') or g
+			end
+		end
+		file:close()
+	end
+
+	return name, group
+end
+
 function SystemHandler:_response()
 	local t = {}
 	
@@ -318,6 +365,8 @@ function SystemHandler:_response()
 		if file then
 			t['p_' .. k] = file:read("*l") or ""
 			file:close()
+		else
+			t['p_' .. k] = "."
 		end
 	end
 	
@@ -355,7 +404,9 @@ function SystemHandler:_response()
 		end
 		file:close()
 	end
-	
+
+	t['p_nb_name'], t['p_nb_group'] = _sambaconf()
+
 	setmetatable(t, { __index = strings['system'] })
 	self:renderResult('system.html', t)
 end
@@ -394,6 +445,19 @@ function SystemHandler:post()
 			util.execute("rm " .. tmpFile)
 		end
 	end
+
+	local name  = self:get_argument("nb_name", false)
+	local group = self:get_argument("nb_group", false)
+
+	local cur_name, cur_group = _sambaconf()
+
+	if name and name ~= cur_name then
+		util.execute("sudo sp-sambaConfigNetbiosName " .. name)
+	end
+
+	if group and group ~= cur_group then
+		util.execute("sudo sp-sambaConfigWorkgroup " .. group)
+	end
 	
 	self:_response()
 end
@@ -414,9 +478,20 @@ function NetworkHandler:_response(type, err)
 	t['p_iftype'] = type
 	t['p_is_wlan'] = is_wireless
 	t['p_onboot_checked'] = config.onboot == "true" and "checked" or ""
-	t['p_dhcp_checked']   = config.bootproto == "dhcp" and "checked" or ""
+	t['p_dhcp_checked']   = config.bootproto == "dhcp" and "checked" or nil
+	t['p_ipv4'] = "(none)"
 
-	t['p_status'] = util.capture("ifconfig " .. int)
+	local status = util.capture("ifconfig " .. int)
+	for line in string.gmatch(status, "(.-)\n") do
+		local state = string.match(line, "flags=%d+<(.-),")
+		local ipv4 = string.match(line, "inet (.-) ")
+		if state then
+			t['p_state'] = state
+		end
+		if ipv4 then
+			t['p_ipv4'] = ipv4
+		end
+	end
 
 	for _, v in ipairs(NetworkConfig.params(is_wireless)) do
 		t["p_"..v] = config[v]
@@ -518,12 +593,25 @@ function SqueezeliteHandler:_response(err)
 	t['p_vis_checked']      = config.vis and "checked" or ""
 	t['p_advanced'] = self:get_argument('advanced', false) and "checked" or nil
 
-	t['p_status'] = util.capture('systemctl status squeezelite.service')
+	local status = util.capture('systemctl status squeezelite.service')
+	if status then
+		for line in string.gmatch(status, "(.-)\n") do
+			local loaded, enabled = string.match(line, "Loaded: (.-) %(.-; (.-)%)")
+			local active, running = string.match(line, "Active: (.-) %((.-)%)")
+			if loaded and enabled then
+				t['p_status'] = loaded .. " / " .. enabled
+			end
+			if active and running then
+				t['p_active'] = active .. " / " .. running
+			end
+		end
+	end
+
 	if config.logfile then
 		local logfile = io.open(config.logfile, "r")
 		if logfile then
 			logfile:close()
-			t['p_status'] = t['p_status'] .. util.capture('tail ' .. config.logfile)
+			t['p_log'] = util.capture('tail ' .. config.logfile)
 		end
 	end
 	
@@ -586,17 +674,23 @@ end
 
 -- squeezeserver.html
 function SqueezeserverHandler:_response()
-	local t = {
-		p_status = util.capture('systemctl status squeezeboxserver.service')
-	}
+	local t = {}
+
+	local status = util.capture('systemctl status squeezeboxserver.service')
+	if status then
+		for line in string.gmatch(status, "(.-)\n") do
+			local loaded, enabled = string.match(line, "Loaded: (.-) %(.-; (.-)%)")
+			local active, running = string.match(line, "Active: (.-) %((.-)%)")
+			if loaded and enabled then
+				t['p_status'] = loaded .. " / " .. enabled
+			end
+			if active and running then
+				t['p_active'] = active .. " / " .. running
+			end
+		end
+	end
 
 	t['p_server_url'] = 'http://' .. string.gsub(self.request['host'], tostring(PORT), 9000)
-
-	local logfile = io.open("/var/log/squeezeboxserver/server.log", "r")
-	if logfile then
-		logfile:close()
-		t['p_status'] = t['p_status'] .. util.capture('tail /var/log/squeezeboxserver/server.log')
-	end
 
 	setmetatable(t, { __index = strings['squeezeserver'] })
 	self:renderResult('squeezeserver.html', t)
@@ -622,19 +716,18 @@ function _ids(tab)
 	return t
 end
 
-function StorageHandler:_response(err, etype)
+function StorageHandler:_response(err)
 	local t = {}
 
 	if err and err ~= "" then
-		log.debug("error: " .. etype .. " " .. err)
-		t['p_error_' .. etype] = err
+		log.debug("error: " .. err)
+		t['p_error'] = err
 	end
 
-	t['p_status']      = StorageConfig.status()
 	t['p_disks']       = _ids(StorageConfig.localdisks())
 	t['p_mountpoints'] = _ids(StorageConfig.mountpoints())
 	t['p_types_local'] = _ids({ '', 'fat', 'ntfs', 'ext2', 'ext3', 'ext4' })
-	t['p_types_nfs']   = _ids({ '', 'nfs', 'nfs4' })
+	t['p_types_remote']= _ids({ '', 'cifs', 'nfs', 'nfs4' })
 
 	local umount_str = strings['storage']['unmount']
 
@@ -656,33 +749,28 @@ function StorageHandler:post()
 	local mountp = self:get_argument('mountpoint', false)
 	local type = self:get_argument('type', false)
 	local opts = self:get_argument('options', false)
-	local err, etype
+	local err
 
 	local type_map = { fat = 'vfat', ntfs = 'ntfs-3g' }
-	opts = type_map[opts] or opts
+	type = type_map[type] or type
 
 	local new_local = self:get_argument('localfs_mount', false)
-	local new_cifs  = self:get_argument('cifs_mount', false)
-	local new_nfs   = self:get_argument('nfs_mount', false)
+	local new_remote= self:get_argument('remotefs_mount', false)
 
-	if new_cifs then
+	if new_remote and type == 'cifs' then
 		-- for cifs we must make sure that either pass or guest is added to the option string else mount.cifs may block
 		local user = self:get_argument('user', false)
 		local pass = self:get_argument('pass', false)
+		local domain = self:get_argument('domain', false)
 		opts = opts or ""
 		if user then
-			opts = opts .. (opts ~= "" and "," or "") .. "user=" .. user
-		end
-		if pass then
-			opts = opts .. (opts ~= "" and "," or "") .. "pass=" .. pass
+			opts = opts .. (opts ~= "" and "," or "") .. "credentials=" .. StorageConfig.cred_file(mountp, user, pass, domain)
 		else
 			opts = opts .. (opts ~= "" and "," or "") .. "guest"
 		end
-		type = 'cifs'
 	end
 
-	if new_local or new_cifs or new_nfs then
-		util.execute("sudo umount " .. mountp)
+	if new_local or new_remote then
 		err = util.capture("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (opts and ("-o " .. opts .. " ") or "") ..
 						   spec .. " " .. mountp)
 		-- if mount worked then persist, storing opts passed not those parsed from active mounts
@@ -696,10 +784,6 @@ function StorageHandler:post()
 				end
 			end
 			StorageConfig.set(mounts)
-		else
-			if new_local then etype = 'localfs' end
-			if new_cifs  then etype = 'cifs' end
-			if new_nfs   then etype = 'nfs' end
 		end
 	end
 
@@ -718,7 +802,7 @@ function StorageHandler:post()
 		StorageConfig.set(mounts)
 	end
 
-	self:_response(err, etype)
+	self:_response(err)
 end
 
 ------------------------------------------------------------------------------------------
@@ -729,14 +813,13 @@ function ShutdownHandler:get()
 end
 
 function ShutdownHandler:post()
-	local force = self:get_argument("force", false)
 	if self:get_argument("halt", false) then
 		log.debug("halt")
-		util.execute("sudo sp-halt" .. (force and " -f" or ""))
+		util.execute("sudo sp-halt")
 	end
 	if self:get_argument("reboot", false) then
 		log.debug("restart")
-		util.execute("sudo sp-reboot" .. (force and " -f" or ""))
+		util.execute("sudo sp-reboot")
 	end
 	self:renderResult('shutdown.html', strings['shutdown'])
 end
@@ -750,12 +833,56 @@ end
 
 ------------------------------------------------------------------------------------------
 
--- help.html
-function HelpHandler:get()
-	self:renderResult('help.html', strings['help'])
+-- log handler
+function LogHandler:get(log)
+	local stream = self:get_argument('stream', false)
+	local lines  = self:get_argument('lines', false) or 100
+	local file, fh
+
+	if log == 'squeezelite' then
+		local config = SqueezeliteConfig.get()
+		file = config and config.logfile
+	elseif log == 'squeezeboxserver' then
+		file = '"/var/log/squeezeboxserver/server.log'
+	end
+
+	if file then
+		fh = io.open(file, "r")
+	end
+	if fh == nil then
+		return
+	else
+		fh:close()
+	end
+		
+	if stream then
+		self:set_header('Content-Type', 'text/plain')
+		self:set_chunked_write()
+		util.stream("tail -n " .. lines .. " -f " .. file,
+			function(chunk)
+				if chunk then
+					self:write(chunk .. "\r\n")
+					self:flush()
+				else
+					self:finish()
+				end
+			end,
+			self
+		)
+	else
+		self:write("<pre>")
+		self:write( util.capture("tail -n " .. lines .. " " .. file) )
+		self:write("</pre>")
+	end
 end
 
-------------------------------------------------------------------------------------------
+function LogHandler:on_connection_close()
+	if self.__stream_close then
+		self.__stream_close()
+	end
+end
+
+-------------------------------------------------------------------------------------------
 
 -- register pages and start server
 turbo.web.Application({
@@ -768,8 +895,8 @@ turbo.web.Application({
     { "^/storage%.html$", StorageHandler },
     { "^/shutdown%.html$", ShutdownHandler },
     { "^/faq%.html$", FaqHandler },
-    { "^/help%.html$", HelpHandler },
-	{ "^/static/(.*)$", turbo.web.StaticFileHandler, static_path }
+    { "^/(.-)%.log$", LogHandler },
+	{ "^/static/(.*)$", turbo.web.StaticFileHandler, static_path },
 }):listen(PORT)
 
 turbo.ioloop.instance():start()

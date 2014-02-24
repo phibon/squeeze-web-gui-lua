@@ -26,15 +26,15 @@ local util, log = util, log
 module(...)
 
 local fstabLocation = "/etc/fstab"
-local fstabTmp      = "/tmp/fstab.tmp"
+local tmpFile       = "/tmp/conf.tmp"
 
-local local_disks    = "/dev/"
-local mount_points   = "/storage"
+local local_disks   = "/dev/"
+local mount_root    = "/storage"
 
 function _mounts()
 	local mounts = {}
 
-	local cap = util.capture('mount | grep ' .. mount_points)
+	local cap = util.capture('mount | grep ' .. mount_root)
 	cap = cap .. "\n"
 	for line in string.gmatch(cap, "(.-)\n") do
 		local spec, mountp, type, opts = string.match(line, "(.-) on (.-) type (.-) %((.-)%)")
@@ -84,12 +84,27 @@ function get()
 	return mounts
 end
 
-function status()
-	return util.capture('mount | grep ' .. mount_points)
-end
-
 function mountpoints()
-	return { mount_points }
+	local available_mounts = { "/storage", "/storage/disk1", "/storage/disk2", "/storage/disk3", "/storage/disk4" }
+	local exclude, t = {}, {}
+
+	-- only show available mounts
+	for _, mount in ipairs(_mounts()) do
+		exclude[mount.mountp] = true
+		if mount.mountp == '/storage' then
+			available_mounts = {}
+			break
+		else
+			exclude['/storage'] = true
+		end
+	end
+	for _, v in ipairs(available_mounts) do
+	    if not exclude[v] then
+		t[#t+1] = v
+	    end
+	end
+	
+	return t
 end
 
 function localdisks()
@@ -105,7 +120,7 @@ end
 
 function set(mounts)
 	local fstab = io.open(fstabLocation, "r")
-	local tmp   = io.open(fstabTmp, "w")
+	local tmp   = io.open(tmpFile, "w")
 
 	if fstab and tmp then
 		-- copy over file excluding portion marked as ours
@@ -131,8 +146,8 @@ function set(mounts)
 		tmp:close()
 		fstab:close()
 
-		util.execute("sudo sp-fstabUpdate " .. fstabTmp)
-		util.execute("rm " .. fstabTmp)
+		util.execute("sudo sp-fstabUpdate " .. tmpFile)
+		util.execute("rm " .. tmpFile)
 
 		log.debug("wrote and updated fstab")
 	else
@@ -140,8 +155,29 @@ function set(mounts)
 			log.error("unable to open: " .. fstabLocation)
 		end
 		if not tmp then
-			log.error("unable to open: " .. fstabTmp)
+			log.error("unable to open: " .. tmpFile)
 		end
 	end
 end
 
+function cred_file(mountp, user, pass, domain)
+	local credFile = 'cifs' .. string.gsub(mountp, "/", "-")
+
+	local tmp = io.open(tmpFile, "w")
+	if tmp then
+		tmp:write("# Created by squeez-web-gui-lua\n")
+		tmp:write("username=" .. (user or "") .. "\n")
+		tmp:write("password=" .. (pass or "") .. "\n")
+		tmp:write("domain=" .. (domain or "") .. "\n")
+		tmp:close()
+
+		util.execute("sudo sp-credentialsUpdate " .. tmpFile .. " " .. credFile)
+		util.execute("rm " .. tmpFile)
+
+		log.debug("updated credentials " .. credFile)
+	else
+		log.error("unable to open: " .. tmpFile)
+	end
+
+	return '/etc/credentials/' .. credFile
+end

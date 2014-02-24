@@ -5,14 +5,29 @@
 <head>
 	<title>{{{brand_name}}} Web Configuration</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<link href="static/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+	<link href="static/stylesheet.css" rel="stylesheet" type="text/css" media="all" />
+	<link href="static/simptip-mini.css" rel="stylesheet" type="text/css" />
 	<link href="static/favicon.ico" rel="icon" type="image/x-icon" />
 	<link href="static/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 </head>
 
-<body>
+<body onload="if (onload) { onload(); }">
 
-<div id="navigation" class="curved container">
+<script type="text/javascript">
+function show(track, show, reverse) {
+  if (document.getElementById(track).checked) {
+    document.getElementById(show).style.display = reverse ? 'none' : '';
+  } else {
+    document.getElementById(show).style.display = reverse ? '' : 'none';
+  }
+}
+function toggle(show) {
+	var el = document.getElementById(show);
+	el.style.display = (el.style.display != 'none' ? 'none' : '' );
+}
+</script>  
+
+<div class="navigation curved container">
 	<span id="nav-home">
 		<a href="/index.html">{{{home}}}</a>
 	</span> 
@@ -40,9 +55,10 @@
 	<span id="nav-faq">
 		<a href="/faq.html">{{{faq}}}</a>
 	</span> 
+	{{#context}}
 	<span id="nav-help">
-		<a href="/help.html">{{{help}}}</a>
-	</span> 
-
+		<a href="#" onclick="javascript:toggle('context')">{{{help}}}</a>
+	</span>
+	{{/context}}
 	<br class="separator" />
 </div>

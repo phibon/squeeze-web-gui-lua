@@ -1,191 +1,172 @@
-<table>
-  <tr>
-    <td>
-	  <a href="/storage.html"><img src="{{{logo_small}}}" 
-	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
-	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
-    </td>
-    <td>
-      <h2>{{{title}}}</h2>
-    </td>
-  </tr>
-</table>
+<script type="text/javascript">
+function remoteTypeCheck() {
+	var e = document.getElementById("type_remote");
+	var val = e.options[e.selectedIndex].value;
+	if (val == 'cifs') {
+		document.getElementById('cifs_only').style.display = '';
+	} else {
+		document.getElementById('cifs_only').style.display = 'none';
+	}
+}
+</script>
 
-<hr />
+<div class="title-block">
+  <a href="/shutdown.html">
+	<div class="title-image">
+	  <img src="{{{logo_small}}}" alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+		   width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" />
+	</div>
+  </a>
+  <div class="title">{{{title}}}</div>
+</div>
 
-<h4>{{{mounts}}}</h4>
-
-<form id="storage" name="storage" action="/storage.html" method="get">
-<table>
-<tr>
-<td>
-  <textarea name="status" cols="100" rows="7" readonly="readonly" id="network_status">{{{ p_status }}}</textarea>
-</td>
-</tr>
-<tr>
-<td align="right">
-  <input type="submit" id="refresh" name="refresh" value="{{refresh}}"/>
-</td>
-</tr>
-</table>
-</form>
-
-{{#p_mounts}}
-<h4>{{{mounts}}}</h4>
-
-<form id="mounts_config" name="mounts_config" action="/storage.html" method="post">
-  <table>
-	<col width="150">
-	<col width="150">
-	<col width="75">
-	<col width="300">
-	<tr>
-	  <td>{{{disk}}}</td>
-	  <td>{{{mountpoint}}}</td>
-	  <td>{{{type}}}</td>
-	</tr>
-{{/p_mounts}}
-{{#p_mounts}}
-	<tr>
-	  <td><font color="blue">{{{p_spec}}}</font></td>
-	  <td><font color="blue">{{{p_mountp}}}</font></td>
-	  <td><font color="blue">{{{p_type}}}</font></td>
-	  <td />
-	  <td align="right">
-		<input type="hidden" name="mountpoint" value="{{{p_mountp}}}">
-		<input type="submit" id="mounts_unmount" name="mounts_unmount" value="{{{p_unmount_str}}}"/>
-	  </td>
-{{/p_mounts}}
-{{#p_mounts}}
-	</tr>
-  </table>
-</form>
-{{/p_mounts}}
-
-<hr />
-
-<h4>{{{localfs}}}</h4>
-
-{{#p_error_localfs}}
+{{#p_error}}
 <ul class="errorMessage">
-  <li><span>{{{p_error_localfs}}}</span></li>
+  <li><span>{{{p_error}}}</span></li>
 </ul>
-{{/p_error_localfs}}
+{{/p_error}}
 
-<form id="localfs_config" name="localfs_config" action="/storage.html" method="post">
-  <table cellspacing="0" cellpadding="0">
-	<tr>
-	  <td>{{{disk}}}</td>
-	  <td>{{{mountpoint}}}</td>
-	  <td>{{{type}}}</td>
-	  <td>{{{options}}}</td>
-	</tr>
-	<tr>
-	  <td>
-		<select name="spec" class="size-150px">
-		  {{#p_disks}}
-		  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
-		  {{/p_disks}}
-		</select>
-	  </td>
-	  <td>
-		<select name="mountpoint" class="size-150px">
-		  {{#p_mountpoints}}
-		  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
-		  {{/p_mountpoints}}
-		</select>
-	  </td>
-	  <td>
-		<select name="type" class="size-75px">
-		  {{#p_types_local}}
-		  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
-		  {{/p_types_local}}
-		</select>
-	  </td>
-	  <td><input type="text" name="options" id="options" class="size-300px"/></td>
-	  <td><input type="submit" id="localfs_mount" name="localfs_mount" value="{{mount}}"/></td>
-	</tr>
-  </table>
-</form>
+<div>
 
-<hr />
-
-<h4>{{{nfs}}}</h4>
-
-{{#p_error_nfs}}
-<ul class="errorMessage">
-  <li><span>{{{p_error_nfs}}}</span></li>
-</ul>
-{{/p_error_nfs}}
-
-<form id="nfs_config" name="nfs_config" action="/storage.html" method="post">
-  <table cellspacing="0" cellpadding="0">
-	<tr>
-	  <td>{{{network}}}</td>
-	  <td>{{{mountpoint}}}</td>
-	  <td>{{{type}}}</td>
-	  <td>{{{options}}}</td>
-	</tr>
-	<tr>
-	  <td>
-		<input type="text" name="spec" id="spec" class="size-150px"/>
-	  </td>
-	  <td>
-		<select name="mountpoint" class="size-150px">
-		  {{#p_mountpoints}}
-		  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
-		  {{/p_mountpoints}}
-		</select>
-	  </td>
-	  <td>
-		<select name="type" class="size-75px">
-		  {{#p_types_nfs}}
-		  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
-		  {{/p_types_nfs}}
-		</select>
-	  </td>
-	  <td><input type="text" name="options" id="options" class="size-300px"/></td>
-	  <td><input type="submit" id="nfs_mount" name="nfs_mount" value="{{mount}}"/></td>
-	</tr>
-  </table>
-</form>
-
-<hr />
-
-<h4>{{{cifs}}}</h4>
-
-{{#p_error_cifs}}
-<ul class="errorMessage">
-  <li><span>{{{p_error_cifs}}}</span></li>
-</ul>
-{{/p_error_cifs}}
-
-<form id="cifs_config" name="cifs_config" action="/storage.html" method="post">
-  <table cellspacing="0" cellpadding="0">
-	<tr>
-	  <td>{{{network}}}</td>
-	  <td>{{{mountpoint}}}</td>
-	  <td>{{{user}}}</td>
-	  <td>{{{pass}}}</td>
-	  <td>{{{options}}}</td>
-	</tr>
-	<tr>
-	  <td>
-		<input type="text" name="spec" id="spec" class="size-150px"/>
-	  </td>
-	  <td>
-		<select name="mountpoint" class="size-150px">
-		  {{#p_mountpoints}}
-		  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
-		  {{/p_mountpoints}}
-		</select>
-	  </td>
-	  <td><input type="text" name="user" id="user" class="size-75px"/></td>
-	  <td><input type="password" name="pass" id="pass" class="size-75px"/></td>
-	  <td><input type="text" name="options" id="options" class="size-225px"/></td>
-	  <td><input type="submit" id="cifs_mount" name="cifs_mount" value="{{mount}}"/></td>
-	</tr>
-  </table>
-</form>
-
-
+  {{{#context}}}
+  <div class="help curved container" id="context" style="display: none">
+	<div class="help-title">
+	  {{{help}}}
+	</div>
+	<div class="help-text">
+	  {{{context}}}
+	</div>
+  </div>
+  {{{/context}}}
+  
+  <div class="config">
+	
+	<form id="mounts_config" name="localfs_config" action="/storage.html" method="post">
+	  <fieldset>
+		<legend>{{{mounts}}}</legend>
+		{{#p_mounts}}
+		<div class="entry-nomargin">
+		  <div class="label">{{{p_mountp}}}</div>
+		  <div class="input">{{{p_spec}}} ({{{p_type}}})</div>
+		</div>
+		<div class="entry submit">
+		  <input type="hidden" name="mountpoint" value="{{{p_mountp}}}">
+		  <input type="submit" id="mounts_unmount" name="mounts_unmount" value="{{{p_unmount_str}}}"/>
+		</div>
+		{{/p_mounts}}
+	  </fieldset>
+	</form>
+	
+	<form id="local_config" name="local_config" action="/storage.html" method="post">
+	  <fieldset>
+		<legend>{{{localfs}}}</legend>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{mountpoint_tip}}}">
+			<label for="mountpoint" class="label">{{{mountpoint}}}</label>
+			<select name="mountpoint" id="mountpoint" class="input">
+			  {{#p_mountpoints}}
+			  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+			  {{/p_mountpoints}}
+			</select>
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{disk_tip}}}">
+			<label for="spec" class="label">{{{disk}}}</label>
+			<select name="spec" id="spec" class="input">
+			  {{#p_disks}}
+			  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+			  {{/p_disks}}
+			</select>
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{type_tip}}}">
+			<label for="type" class="label">{{{type}}}</label>
+			<select name="type" id="type" class="input">
+			  {{#p_types_local}}
+			  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+			  {{/p_types_local}}
+			</select>
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{options_tip}}}">
+			<label for="options" class="label">{{{options}}}</label>
+			<input class="input" type="text" name="options" id="options" />
+		  </div>
+		</div>
+	  </fieldset>
+	  <fieldset>
+		<div class="entry submit">
+		  <input type="submit" id="localfs_mount" name="localfs_mount" value="{{mount}}"/>
+		</div>
+	  </fieldset>
+	</form>
+	
+	<form id="remote_config" name="remote_config" action="/storage.html" method="post">
+	  <fieldset>
+		<legend>{{{remotefs}}}</legend>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{mountpoint_tip}}}">
+			<label for="mountpoint_remote" class="label">{{{mountpoint}}}</label>
+			<select name="mountpoint" id="mountpoint_remote" class="input">
+			  {{#p_mountpoints}}
+			  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+			  {{/p_mountpoints}}
+			</select>
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{network_tip}}}">
+			<label for="spec_remote" class="label">{{{network}}}</label>
+			<input class="input" type="text" name="spec" id="spec_remote" />
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{type_tip}}}">
+			<label for="type_remote" class="label">{{{type}}}</label>
+			<select name="type" id="type_remote" class="input" onchange="javascript:remoteTypeCheck()">
+			  {{#p_types_remote}}
+			  <option value="{{{id}}}" {{{selected}}}>{{{id}}}</option>
+			  {{/p_types_remote}}
+			</select>
+		  </div>
+		</div>
+		<div id="cifs_only" style="display: none">
+		  <div class="entry">
+			<div class="features simptip-position-right simptip-smooth" data-tooltip="{{{user_tip}}}">
+			  <label for="user" class="label">{{{user}}}</label>
+			  <input class="input" type="text" name="user" id="user" />
+			</div>
+		  </div>
+		  <div class="entry">
+			<div class="features simptip-position-right simptip-smooth" data-tooltip="{{{pass_tip}}}">
+			  <label for="pass" class="label">{{{pass}}}</label>
+			  <input class="input" type="password" name="pass" id="pass" />
+			</div>
+		  </div>
+		  <div class="entry">
+			<div class="features simptip-position-right simptip-smooth" data-tooltip="{{{domain_tip}}}">
+			  <label for="domain" class="label">{{{domain}}}</label>
+			  <input class="input" type="text" name="domain" id="domain" />
+			</div>
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{options_tip}}}">
+			<label for="options_remote" class="label">{{{options}}}</label>
+			<input class="input" type="text" name="options" id="options_remote" />
+		  </div>
+		</div>
+	  </fieldset>
+	  <fieldset>
+		<div class="entry submit">
+		  <input type="submit" id="remotefs_mount" name="remotefs_mount" value="{{mount}}"/>
+		</div>
+	  </fieldset>
+	</form>
+	
+  </div>
+  
+</div>

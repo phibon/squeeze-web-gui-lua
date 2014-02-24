@@ -1,63 +1,97 @@
-<table>
-  <tr>
-    <td>
-	  <a href="/system.html"><img src="{{{logo_small}}}" 
-	     alt="{{{brand_name}}} {{{logo_small_alt}}}" 
-	     width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" /></a>
-    </td>
-    <td>
-      <h2>{{{title}}}</h2>
-    </td>
-  </tr>
-</table>
+<div class="title-block">
+  <a href="/system.html">
+	<div class="title-image">
+	  <img src="{{{logo_small}}}" alt="{{{brand_name}}} {{{logo_small_alt}}}" 
+		   width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" />
+	</div>
+  </a>
+  <div class="title">{{{title}}}</div>
+</div>
 
-<table class="copyright">
-<tr>
-  <td align="right" >{{{os_version}}}</td>
-  <td>{{{p_os_version}}}</td>
-</tr>
-<tr>
-  <td align="right" >{{{fedora_version}}}</td>
-  <td>{{{p_fedora_version}}}</td>
-</tr>
-</table>
+<div>
+  
+  {{{#context}}}
+  <div class="help curved container" id="context" style="display: none">
+	<div class="help-title">
+	  {{{help}}}
+	</div>
+	<div class="help-text">
+	  {{{context}}}
+	</div>
+  </div>
+  {{{/context}}}
+  
+  <div class="config">
+	
+	<fieldset>
+	  <legend>{{{version}}}</legend>
+	  <div class="entry-nomargin smaller">
+		<div class="label">{{{os_version}}}</div>
+		<div class="input">{{{p_os_version}}}</div>
+	  </div>
+	  <div class="entry-nomargin smaller">
+		<div class="label">{{{fedora_version}}}</div>
+		<div class="input">{{{p_fedora_version}}}</div>
+	  </div>
+	</fieldset>
+  
+	<form id="system" name="system" action="/system.html" method="post">
+	  <fieldset>
+		<legend>{{{hostname}}}</legend>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{hostname_tip}}}">
+			<label for="hostname" class="label">{{{hostname}}}</label>
+			<input class="input" type="text" name="hostname" value="{{{p_hostname}}}" id="hostname" />
+		  </div>
+		</div>
+	  </fieldset>
+	  <fieldset>
+		<legend>{{{location}}}</legend>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{timezone_tip}}}">
+			<label for="timezone" class="label">{{{timezone}}}</label>
+			<select class="input" name="timezone" id="timezone">
+			  {{#p_zones}}
+			  <option value="{{{zone}}}" {{{selected}}}>{{{zone}}}</option>
+			  {{/p_zones}}
+			</select>
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{locale_tip}}}">
+			<label for="locale" class="label">{{{locale}}}</label>
+			<select class="input" name="locale" id="locale">
+			  {{#p_locales}}
+			  <option value="{{{loc}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_locales}}
+			</select>
+		  </div>
+		</div>
+	  </fieldset>
+	  <fieldset>
+		<legend>{{{samba}}}</legend>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{nb_name_tip}}}">
+			<label for="nb_name" class="label">{{{nb_name}}}</label>
+			<input class="input" type="text" name="nb_name" value="{{{p_nb_name}}}" id="nb_name" />
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{nb_group_tip}}}">
+			<label for="nb_group" class="label">{{{nb_group}}}</label>
+			<input class="input" type="text" name="nb_group" value="{{{p_nb_group}}}" id="nb_group" />
+		  </div>
+		</div>
+	  </fieldset>
+	  <fieldset>
+		<div class="entry submit">
+		  <input type="reset" name="reset" value="{{{reset}}}"/>
+		  <input type="submit" id="system" name="system" value="{{{save}}}"/>
+		</div>
+	  </fieldset>
+	</form>
 
-<hr />
+  </div>	
 
-<h4>{{{configuration}}}</h4>
+</div>
 
-<form id="system" name="system" action="/system.html" method="post">
-<table>
-<tr>
-  <td align="right">{{{hostname}}}<img src='static/tooltip.gif' title="{{{hostname_tip}}}" alt="{{{hostname_tip}}}" /></td>
-  <td><input type="text" name="hostname" value="{{{p_hostname}}}" id="hostname" class="size-300px"/></td>
-</tr>
-<tr>
-  <td align="right">{{{timezone}}}<img src='static/tooltip.gif' title="{{{timezone_tip}}}" alt="{{{timezone_tip}}}" /></td>
-  <td>
-	<select name="timezone" id="timezone" class="size-300px">
-	  {{#p_zones}}
-      <option value="{{{zone}}}" {{{selected}}}>{{{zone}}}</option>
-	  {{/p_zones}}
-	</select>
-  </td>
-</tr>
-<tr>
-  <td align="right">{{{locale}}}<img src='static/tooltip.gif' title="{{{locale_tip}}}" alt="{{{locale_tip}}}" /></td>
-  <td>
-	<select name="locale" id="locale" class="size-300px">
-	  {{#p_locales}}
-      <option value="{{{loc}}}" {{{selected}}}>{{{desc}}}</option>
-	  {{/p_locales}}
-	</select>
-  </td>
-</tr>
-
-<tr>
-  <td colspan="2" align="right">
-	<input type="reset" name="reset" value="{{{reset}}}"/>
-	<input type="submit" id="timezone" name="timezone" value="{{{save}}}"/>
-  </td>
-</tr>
-</table>
-</form>
