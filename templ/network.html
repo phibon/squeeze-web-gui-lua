@@ -1,3 +1,13 @@
+<script type="text/javascript">
+function show(track, show) {
+  if (document.getElementById(track).checked) {
+    document.getElementById(show).style.display = 'none';
+  } else {
+    document.getElementById(show).style.display = '';
+  }
+}
+</script>
+
 <div class="title-block">
   <a href="/network.html">
 	<div class="title-image">
@@ -67,7 +77,7 @@
 		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{dhcp_tip}}}">
 			<label for="dhcp" class="label">{{{dhcp}}}</label>
 			<input class="input-check" type="checkbox" name="dhcp" value="true" {{{p_dhcp_checked}}} id="dhcp" 
-				   onclick="javascript:show('dhcp', 'static', true);"/>
+				   onclick="javascript:show('dhcp', 'static');"/>
 		  </div>
 		</div>
 		{{#p_is_wlan}}

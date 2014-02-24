@@ -11,19 +11,12 @@
 	<link href="static/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 </head>
 
-<body onload="if (onload) { onload(); }">
+<body>
 
 <script type="text/javascript">
-function show(track, show, reverse) {
-  if (document.getElementById(track).checked) {
-    document.getElementById(show).style.display = reverse ? 'none' : '';
-  } else {
-    document.getElementById(show).style.display = reverse ? '' : 'none';
-  }
-}
 function toggle(show) {
-	var el = document.getElementById(show);
-	el.style.display = (el.style.display != 'none' ? 'none' : '' );
+  var el = document.getElementById(show);
+  el.style.display = (el.style.display != 'none' ? 'none' : '' );
 }
 </script>  
 

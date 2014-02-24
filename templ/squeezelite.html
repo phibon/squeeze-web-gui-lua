@@ -1,27 +1,52 @@
 <script type="text/javascript">
+var log_xhr;
 function update_log(id, url, lines) {
-	var xhr = new XMLHttpRequest();
-	if (xhr) {
-		xhr.onreadystatechange = function() {
-			if (xhr.readyState == 3) {
-				var lines = xhr.responseText.split('\n')
-				if (lines.length > lines) {
-					lines.splice(0, lines.length - lines)
-				}
-				var textArea = document.getElementById(id);
-				textArea.textContent = lines.join('\n');
-				textArea.scrollTop = textArea.scrollHeight;
-			}
-		}
-		xhr.open("GET", url, true);
-		xhr.send();
-		return xhr;
-	}
+  var xhr = new XMLHttpRequest();
+  if (xhr) {
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState == 3) {
+        var lines = xhr.responseText.split('\n')
+        if (lines.length > lines) {
+          lines.splice(0, lines.length - lines)
+        }
+        var textArea = document.getElementById(id);
+        textArea.textContent = lines.join('\n');
+        textArea.scrollTop = textArea.scrollHeight;
+      }
+    }
+    xhr.open("GET", url, true);
+    xhr.send();
+    return xhr;
+  }
 }
-function onload() {
-	update_log('squeezelite_status', 'squeezelite.log?stream=1', 100)
+function startstop_log(action) {
+  if (!action) {
+    action = log_xhr ? 'stop' : 'start';
+  }
+  if (action == 'start' && !log_xhr) {
+    log_xhr = update_log('squeezelite_status', 'squeezelite.log?stream=1', 100);
+  } else if (action == 'stop' && log_xhr) {
+    log_xhr.abort();
+    log_xhr = null;
+  }
 }
-</script>  
+function show(track, show1, show2) {
+  if (document.getElementById(track).checked) {
+    document.getElementById(show1).style.display = '';
+    document.getElementById(show2).style.display = '';
+    startstop_log('start');
+  } else {
+    document.getElementById(show1).style.display = 'none';
+    document.getElementById(show2).style.display = 'none';
+    startstop_log('stop')
+  }
+}
+{{#p_advanced}}
+window.onload = function() {
+  startstop_log('start');
+}
+{{/p_advanced}}
+</script>
 
 <div class="title-block">
   <a href="/squeezelite.html">
@@ -150,7 +175,7 @@ function onload() {
 		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{advanced_tip}}}">
 			<label for="adv" class="label">{{{advanced}}}</label>
 			<input class="input-check" type="checkbox" name="advanced" value="true" {{{p_advanced}}} id="adv"
-				   onclick="javascript:show('adv', 'advanced'); javascript:show('adv', 'log');" />
+				   onclick="javascript:show('adv','advanced','log');" />
 		  </div>
 		</div>
 	  </fieldset>
@@ -219,6 +244,6 @@ function onload() {
 </div>
   
 <div id="log" {{^p_advanced}} style="display: none" {{/p_advanced}}>
-  <textarea class="log" name="status" readonly="readonly" id="squeezelite_status">{{{p_log}}}</textarea>
+  <textarea class="log" name="status" readonly="readonly" id="squeezelite_status" onclick="javascript:startstop_log();">{{{p_log}}}</textarea>
 </div>
 
