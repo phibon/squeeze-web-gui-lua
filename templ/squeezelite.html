@@ -30,14 +30,16 @@ function startstop_log(action) {
     log_xhr = null;
   }
 }
-function show(track, show1, show2) {
+function show(track, show1, show2, show3) {
   if (document.getElementById(track).checked) {
     document.getElementById(show1).style.display = '';
     document.getElementById(show2).style.display = '';
+    document.getElementById(show3).style.display = '';
     startstop_log('start');
   } else {
     document.getElementById(show1).style.display = 'none';
     document.getElementById(show2).style.display = 'none';
+    document.getElementById(show3).style.display = 'none';
     startstop_log('stop')
   }
 }
@@ -73,6 +75,9 @@ window.onload = function() {
 	</div>
 	<div class="help-text">
 	  {{{context}}}
+	  <div id="context-advanced" style="display: none">
+		{{{context_advanced}}}
+	  </div>
 	</div>
   </div>
   {{{/context}}}
@@ -175,11 +180,23 @@ window.onload = function() {
 		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{advanced_tip}}}">
 			<label for="adv" class="label">{{{advanced}}}</label>
 			<input class="input-check" type="checkbox" name="advanced" value="true" {{{p_advanced}}} id="adv"
-				   onclick="javascript:show('adv','advanced','log');" />
+				   onclick="javascript:show('adv','advanced','log', 'context-advanced');" />
 		  </div>
 		</div>
 	  </fieldset>
 	  <fieldset id="advanced" {{^p_advanced}} style="display: none" {{/p_advanced}}>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{loglevel_tip}}}">
+			<label for="loglevel" class="label">{{{loglevel}}}</label>
+			<input class="input" type="text" name="loglevel" value="{{{p_loglevel}}}" id="loglevel" />
+		  </div>
+		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{logfile_tip}}}">
+			<label for="logfile" class="label">{{{logfile}}}</label>
+			<input class="input" type="text" name="logfile" value="{{{p_logfile}}}" id="logfile" />
+		  </div>
+		</div>
 		<div class="entry">
 		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{priority_tip}}}">
 			<label for="priority" class="label">{{{priority}}}</label>
@@ -196,18 +213,6 @@ window.onload = function() {
 		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{codec_tip}}}">
 			<label for="codec" class="label">{{{codec}}}</label>
 			<input class="input" type="text" name="codec" value="{{{p_codec}}}" id="codec" />
-		  </div>
-		</div>
-		<div class="entry">
-		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{logfile_tip}}}">
-			<label for="logfile" class="label">{{{logfile}}}</label>
-			<input class="input" type="text" name="logfile" value="{{{p_logfile}}}" id="logfile" />
-		  </div>
-		</div>
-		<div class="entry">
-		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{loglevel_tip}}}">
-			<label for="loglevel" class="label">{{{loglevel}}}</label>
-			<input class="input" type="text" name="loglevel" value="{{{p_loglevel}}}" id="loglevel" />
 		  </div>
 		</div>
 		<div class="entry">

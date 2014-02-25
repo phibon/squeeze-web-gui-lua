@@ -757,16 +757,23 @@ function StorageHandler:post()
 	local new_local = self:get_argument('localfs_mount', false)
 	local new_remote= self:get_argument('remotefs_mount', false)
 	
-	if new_remote and type == 'cifs' then
-		-- for cifs we must make sure that either credentials or guest is added to the option string else mount.cifs may block
-		local user = self:get_argument('user', false)
-		local pass = self:get_argument('pass', false)
-		local domain = self:get_argument('domain', false)
-		opts = opts or ""
-		if user then
-			opts = opts .. (opts ~= "" and "," or "") .. "credentials=" .. StorageConfig.cred_file(mountp, user, pass, domain)
-		else
-			opts = opts .. (opts ~= "" and "," or "") .. "guest"
+	if new_local then
+		opts = opts or "defaults"
+	end
+
+	if new_remote then
+		opts = opts or "defaults,_netdev"
+
+		if type == 'cifs' then
+			-- for cifs we must make sure that either credentials or guest is added to the option string else mount.cifs may block
+			local user = self:get_argument('user', false)
+			local pass = self:get_argument('pass', false)
+			local domain = self:get_argument('domain', false)
+			if user then
+				opts = opts .. ",credentials=" .. StorageConfig.cred_file(mountp, user, pass, domain)
+			else
+				opts = opts .. ",guest"
+			end
 		end
 	end
 	
