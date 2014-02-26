@@ -179,6 +179,9 @@ return {
 	['faq'] = {
 		title = "FAQ",
 	},
+	['resample'] = {
+		title = "Resample",
+	},
 	['header'] = {
 		home = "Home",
 		system = "System",

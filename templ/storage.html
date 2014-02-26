@@ -11,7 +11,7 @@ function remoteTypeCheck() {
 </script>
 
 <div class="title-block">
-  <a href="/shutdown.html">
+  <a href="/storage.html">
 	<div class="title-image">
 	  <img src="static/backup.png" width="64" height="64" alt="Storage" /> 
 	</div>
@@ -54,6 +54,9 @@ function remoteTypeCheck() {
 		<div class="entry-nomargin">
 		  <div class="label">{{{p_mountp}}}</div>
 		  <div class="input">{{{p_spec}}} ({{{p_type}}})</div>
+		</div>
+		<div class="entry-indent smaller">
+		  {{{p_opt}}}
 		</div>
 		<div class="entry submit">
 		  <input type="hidden" name="mountpoint" value="{{{p_mountp}}}">

@@ -277,6 +277,7 @@ local SqueezeserverHandler = class("SqueezeserverHandler", PageHandler)
 local StorageHandler     = class("StorageHandler", PageHandler)
 local ShutdownHandler    = class("ShutdownHandler", PageHandler)
 local FaqHandler         = class("FaqHandler", PageHandler)
+local ResampleHandler    = class("ResampleHandler", PageHandler)
 local LogHandler         = class("LogHandler", turbo.web.RequestHandler)
 
 ------------------------------------------------------------------------------------------
@@ -733,7 +734,7 @@ function StorageHandler:_response(err)
 
 	for _, v in ipairs(StorageConfig.get()) do
 		t['p_mounts'] = t['p_mounts'] or {}
-		table.insert(t['p_mounts'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opt, p_perm = v.perm, p_unmount_str = umount_str })
+		table.insert(t['p_mounts'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opts, p_perm = v.perm, p_unmount_str = umount_str })
 	end
 
 	setmetatable(t, { __index = strings['storage'] })
@@ -840,6 +841,13 @@ end
 
 ------------------------------------------------------------------------------------------
 
+-- resample.html
+function ResampleHandler:get()
+	self:renderResult('resample.html', strings['resample'])
+end
+
+------------------------------------------------------------------------------------------
+
 -- log handler
 function LogHandler:get(log)
 	local stream = self:get_argument('stream', false)
@@ -902,6 +910,7 @@ turbo.web.Application({
     { "^/storage%.html$", StorageHandler },
     { "^/shutdown%.html$", ShutdownHandler },
     { "^/faq%.html$", FaqHandler },
+    { "^/resample%.html$", ResampleHandler },
     { "^/(.-)%.log$", LogHandler },
 	{ "^/static/(.*)$", turbo.web.StaticFileHandler, static_path },
 }):listen(PORT)
