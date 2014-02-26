@@ -11,6 +11,9 @@ function show(track, show) {
 <div class="title-block">
   <a href="/network.html">
 	<div class="title-image">
+	  <img src="static/network.png" width="64" height="64" alt="Network" /> 
+	</div>
+	<div class="title-image">
 	  <img src="{{{logo_small}}}" alt="{{{brand_name}}} {{{logo_small_alt}}}" 
 		   width="{{{logo_small_width}}}" height="{{{logo_small_height}}}" />
 	</div>
@@ -19,6 +22,9 @@ function show(track, show) {
 	{{#p_is_wlan}}{{{title_wlan}}}{{/p_is_wlan}}
 	{{^p_is_wlan}}{{{title_eth}}}{{/p_is_wlan}}
   </div>
+</div>
+
+<div style="clear: both;">
 </div>
 
 {{#p_error}}
