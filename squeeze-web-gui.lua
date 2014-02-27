@@ -473,7 +473,7 @@ function NetworkHandler:_response(type, err)
 	local t = {}
 
 	if err then
-		t['p_error'] = err and (strings['squeezelite']["error_" .. err] or 'validation error - ' .. err)
+		t['p_error'] = err and (strings['network']["error_" .. err] or 'validation error - ' .. err)
 	end
 
 	t['p_iftype'] = type

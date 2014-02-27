@@ -68,6 +68,13 @@ return {
 		wpa_psk_tip = "Enter WPA Password",
 		on_boot_tip = "Enable this inteface at boot time",
 		dhcp_tip = "Use DHCP to obtain IP address information",
+		error_ipaddr0 = "Error setting IP Address",
+		error_gateway0 = "Error setting Gateway",
+		error_netmask0 = "Error setting Netmask",
+		error_dns1 = "Error setting DNS1",
+		error_dns2 = "Error setting DNS2",
+		error_dns3 = "Error setting DNS3",
+		error_static = "Error setting static address - IP Address, Netmask and Gateway required",
 		context =
 		"<ul><li>The current status of the interface is shown at the top of the page.  If no IP address is shown then the interface is not working correctly.</li>" ..
 		"<li><i><b>On&nbsp;Boot</b></i> defines if the interface is activated when your device starts.  Ensure at least one of the interfaces has this set.</li>" ..
@@ -112,6 +119,15 @@ return {
 		other_tip = "Other optional configuration parameters",
 		server_tip = "Server IP address (optional)",
 		advanced_tip = "Show advanced options",
+		error_mac = "Error setting MAC Address",
+		error_priority = "Error setting RT Thread Priority",
+		error_rate = "Error setting Rate",
+		error_buffer = "Error setting Buffer",
+		error_code = "Error setting Codec",
+		error_alsa = "Error setting Alsa Params",
+		error_loglevel = "Error setting Log Level",
+		error_server = "Error settting Server",
+		error_dop_params = "Error setting DoP Params",
 		context = 
 		"<ul><li>The <i><b>Status</b></i> area at the top of the page shows the current Squeezelite Player status and may be refreshed by pressing the <i>Refresh</i> button. Squeezelite can be <i>Enable</i>d, <i>Disable</i>d and <i>Restart</i>ed  using the respective buttons. The player will be reported as <i>active / running</i> if it is running correctly. If it fails to show this then check the configuration options and restart the player.</li>" ..
 		"<li>Configuration options are specified in the fields to the left.  Update each field and click <i>Save</i> to store them or <i>Save&nbsp;and&nbsp;Restart</i> to store them and then restart the player using the new options.</li>" ..

@@ -133,8 +133,8 @@ function validate(c)
 	if c.codec and not commalist(c.codec, "%l+") then
 		return 'codec'
 	end
-	if c.alsa and not (string.match(c.alsa, "^%d+") or string.match(c.alsa, "^%d-:%d-$") or string.match(c.alsa, "^%d-:%d-$:%.-$") or 
-					   string.match(c.alsa, "^%d-:%d-:%.-:%d$") or string.match(c.alsa, "^%d-:%d-:%.-:%d-:%d$")) then
+	if c.alsa and not (string.match(c.alsa, "^%d+") or string.match(c.alsa, "^%d-:%d-$") or string.match(c.alsa, "^%d-:%d-:.-$") or 
+					   string.match(c.alsa, "^%d-:%d-:.-:%d$") or string.match(c.alsa, "^%d-:%d-:.-:%d-:%d$")) then
 		return 'alsa'
 	end
 	if c.loglevel and not string.match(c.loglevel, "^%l+=%l+$") then
