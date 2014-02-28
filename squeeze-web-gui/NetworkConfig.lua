@@ -40,7 +40,7 @@ function params(wireless)
 end
 
 function get(int, is_wireless)
-	local config = {}
+	local config = { onboot = "true" }
 
 	local conf = io.open(configFilePrefix .. int, "r")
 	if conf then
