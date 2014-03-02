@@ -276,6 +276,12 @@ legend {
   padding: 10px;
   font-size: smaller;
 }
+li li {
+  margin: 0;
+  padding: 0 0 0.25em;
+  text-indent: 0;
+  font-size: 100%;
+}
 .config {
   width: 50%;
 }

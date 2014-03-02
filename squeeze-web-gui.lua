@@ -823,13 +823,17 @@ end
 function ShutdownHandler:post()
 	if self:get_argument("halt", false) then
 		log.debug("halt")
+		self:renderResult('reboothalt.html', 
+						  setmetatable({ p_message = strings['reboothalt']['halting'] }, { __index = strings['reboothalt'] }))
 		util.execute("sudo sp-halt")
-	end
-	if self:get_argument("reboot", false) then
+	elseif self:get_argument("reboot", false) then
 		log.debug("restart")
+		self:renderResult('reboothalt.html', 
+						  setmetatable({ p_message = strings['reboothalt']['rebooting'] }, { __index = strings['reboothalt'] }))
 		util.execute("sudo sp-reboot")
+	else
+		self:renderResult('shutdown.html', strings['shutdown'])
 	end
-	self:renderResult('shutdown.html', strings['shutdown'])
 end
 
 ------------------------------------------------------------------------------------------

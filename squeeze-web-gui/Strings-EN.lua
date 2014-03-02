@@ -79,8 +79,8 @@ return {
 		"<ul><li>The current status of the interface is shown at the top of the page.  If no IP address is shown then the interface is not working correctly.</li>" ..
 		"<li><i><b>On&nbsp;Boot</b></i> defines if the interface is activated when your device starts.  Ensure at least one of the interfaces has this set.</li>" ..
 		"<li><i><b>DHCP</b></i> is normally selected to obtain IP addresing from your network.  Clear it if you prefer to define static IP address information.</li>" ..
-		"<li>For wireless networks you can select which network to use from the list of detected <i>Network&nbsp;Names</i> or define your own if it is hidden.  You should also specify a WPA Password.  Note that WPA/WPA2 with a pre-shared key is the only authentication option supported by the configuration page.</li>" ..
 		"<li><i>Save</i> conifiguration changes and select <i>Interface&nbsp;Down&nbsp;/&nbsp;Interface&nbsp;Up</i> to restart the interface with new parameters.</li>",
+		context_wifi = "<li>For wireless networks you can select which network to use from the list of detected <i>Network&nbsp;Names</i> or define your own if it is hidden.  You should also specify a WPA Password.  Note that WPA/WPA2 with a pre-shared key is the only authentication option supported by the configuration page.</li>",
 	},
 	['squeezelite'] = {
 		title = "Squeezelite Player Configuration and Control",
@@ -133,7 +133,14 @@ return {
 		"<li>Configuration options are specified in the fields to the left.  Update each field and click <i>Save</i> to store them or <i>Save&nbsp;and&nbsp;Restart</i> to store them and then restart the player using the new options.</li>" ..
 		"<li><i><b>Name</b></i> allows you to specify the player name.  If you leave it blank, you can set the player name from within Squeezebox Server.</i>" ..
 		"<li><i><b>Audio Device</b></i> specifies which audio output device to use and should always be set.  You should normally prefer devices with names starting <i>hw:</i> to directly drive the hardware output device.  If multiple devices are listed, try each device in turn and restart the player each time to find the correct device for your DAC.</li>" ..
-		"<li><i><b>Alsa&nbsp;Params</b></i> specifies detailed Alsa configuration parameters and is not normally needed for your device to work.  Use it if the player status shows it is not running or to optimise audio playback if you experience drop outs. This field contains four parameters separated by ':' (colons), for example: <i>40:4:16:1</i>. Each field can be left blank to use the default. You may want to try <i>'::16:0'</i> or <i>':::0'</i> if your device fails to start with the default setting. Try <i>'100:::'</i> or larger if you are experiencing drop outs.</li>" ..
+		"<li><i><b>Alsa&nbsp;Params</b></i> specifies detailed Alsa configuration parameters and is not normally needed for your device to work.  Use it if the player status shows it is not running or to optimise audio playback if you experience drop outs. This field contains four parameters separated by ':' (colons), for example: '40:4:16:1'. Each field can be left out to use the default. They are:" ..
+		"<ul>" ..
+		"<li>Alsa <i>buffer time</i> in ms, or <i>buffer size</i> in bytes; (default 40), increase if you experience drop outs</li>" ..
+		"<li>Alsa <i>period count</i> or <i>period size</i> in bytes; (default 4)</li>" ..
+		"<li>Alsa <i>sample format</i> - one of 32, 24, 24_3 or 16; (default autodetect), try 16 if other values do not work</li>" ..
+		"<li>Alsa <i>MMAP</i> - one of 0 or 1; (default autodetect), try 0 if other values do not work</li>" ..
+		"</ul>" ..
+		"<li>You may want to try '::16:0' or ':::0' if your device fails to start. Try '100:::' if you are experiencing drop outs.</li>" ..
 		"<li><i><b>Sample&nbsp;Rates</b></i> allows you to specify the sample rates supported by the device so that it does not need to be present when Squeezelite is started.  Ether specify a single <i>maximum</i> sample rate, specify the <i>minimum</i> and <i>maximum</i> rates separated by '-' (dash without spaces), or specify all supported rates separated by commas.</li>" ..
 		"<li><i><b>Resample</b></i> enables software resampling (upsampling) using the parameters specified. These are described in more detail <a href='/resample.html'>here</a>.</li>" ..
 		"<li>Select <i><b>Dop</b></i> to indicate that your DAC supports DSP over PCM (DoP) playback. You may also specify a delay in ms when switching between PCM and DoP modes.</i>" ..
@@ -178,7 +185,7 @@ return {
 		context =
 		"<ul><li>Use this menu to attach (mount) local and remote disks to your device for use with the internal Squeezebox Server.</li>" ..
 		"<li>The <i><b>Mount&nbsp;Local&nbsp;Disk</b></i> section is used to attach local disks. Select one of the mountpoint options. This is the path where it will appear on the device file system. Select one of the disk options. You will not normally need to select the type of the disk as this is detected automatically from it's format.  Click <i>Add</i> to attach the disk to the device. If this is sucessful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown. If your disk has multiple partitions you may need to try each disk option in turn to find the correct one for your files.</li>" ..
-		"<li>The <i><b>Mount&nbsp;Network&nbsp;Share</b></i> section is used to attach network shares. Select one of the mountpoint options. Then add the network share location and select the type of network share.  For Windows (Cifs) shares you will also be asked for a username, password and domain. You may not need to include all of these details. Click <i>Add</i> to attach the disk to the device. If this is sucessful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown.</li>" ..
+		"<li>The <i><b>Mount&nbsp;Network&nbsp;Share</b></i> section is used to attach network shares. Select one of the mountpoint options. Then add the network share location and select the type of network share.  For Windows (Cifs) shares you will also be asked for a username, password and domain. You may not need to include all of these details. Click <i>Add</i> to attach the disk to the device. If this is successful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown.</li>" ..
 		"<li>Mounted file systems will be re-attached when the device restarts if they are available.  To disconnect them click the <i>Remove</i> button alongside the mount entry in the <i>Mounted&nbsp;File&nbsp;Systems</i> area.</li>",
 	},
 	['shutdown'] = {
@@ -191,6 +198,10 @@ return {
 		context =
 		"<ul><li>Use this menu to reboot or shutdown (halt) your device.</li>" ..
 		"<li>Please wait 30 seconds after halting the device before removing the power.</li>",
+	},
+	['reboothalt'] = {
+		halting = "Device shutting down - please wait 30 seconds before removing power",
+		rebooting = "Device rebooting",
 	},
 	['faq'] = {
 		title = "FAQ",
