@@ -37,8 +37,12 @@ function _mounts()
 	for line in string.gmatch(cap, "(.-)\n") do
 		if string.match(line, "/storage") or string.match(line, "/mnt/disk") then
 			local spec, mountp, type, opts = string.match(line, "(.-) on (.-) type (.-) %((.-)%)")
+			-- mount returns fuseblk for ntfs-3g file systems, but does not understand it as a fstype
+			if type == 'fuseblk' then
+				type = 'ntfs-3g'
+			end
 			if spec and mountp and type and opts then
-				mounts[#mounts+1] = { spec = spec, mountp = mountp, type = type, opts = opts, perm = false } 
+				mounts[#mounts+1] = { spec = spec, mountp = mountp, type = type, opts = opts, perm = false, active = true } 
 			end
 		end
 	end
@@ -84,17 +88,18 @@ function get()
 	return mounts
 end
 
-function mountpoints()
+function mountpoints(mounts)
+	local mounts = mounts or _mounts()
 	local available_mounts = { "/storage", "/mnt/disk1", "/mnt/disk2", "/mnt/disk3", "/mnt/disk4", "/mnt/disk5" }
 	local exclude, t = {}, {}
-
+	
 	-- only show available mounts
-	for _, mount in ipairs(_mounts()) do
+	for _, mount in ipairs(mounts) do
 		exclude[mount.mountp] = true
 	end
 	for _, v in ipairs(available_mounts) do
 	    if not exclude[v] then
-		t[#t+1] = v
+			t[#t+1] = v
 	    end
 	end
 	

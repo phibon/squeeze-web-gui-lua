@@ -29,7 +29,7 @@ return {
 		"<ul><li>Use this page to set the configurations for the linux operating system running within your device.</li>" ..
 		"<li><i><b>Hostname</b></i> sets the name for your device. This may be different from the name given to the player instance running on the device. You are likely to see this name from other devices on your network if they show names of machines on your network.</li>" ..
 		"<li><i><b>Location</b></i> settings enable the timezone and language settings of the device to be set to your country.</li>" ..
-		"<li><i><b>Samba</b></i> settings enable you to specify the settings for the local Windows file sharing server (Samba) within the device.  This is used so you can access disks which are mounted on device from other machines on your network.  Disks are mounted on the device using the Storage menu.</li>",
+		"<li><i><b>Samba</b></i> settings enable you to specify the settings for the local Windows file sharing server (Samba) within the device.  This is used so you can access disks which are mounted on device from other machines on your network.  Disks are mounted on the device using the Storage menu.</li></ul>",
 	},
 	['network'] = {
 		title_eth  = "Ethernet Interface Configuration",
@@ -79,8 +79,8 @@ return {
 		"<ul><li>The current status of the interface is shown at the top of the page.  If no IP address is shown then the interface is not working correctly.</li>" ..
 		"<li><i><b>On&nbsp;Boot</b></i> defines if the interface is activated when your device starts.  Ensure at least one of the interfaces has this set.</li>" ..
 		"<li><i><b>DHCP</b></i> is normally selected to obtain IP addresing from your network.  Clear it if you prefer to define static IP address information.</li>" ..
-		"<li><i>Save</i> conifiguration changes and select <i>Interface&nbsp;Down&nbsp;/&nbsp;Interface&nbsp;Up</i> to restart the interface with new parameters.</li>",
-		context_wifi = "<li>For wireless networks you can select which network to use from the list of detected <i>Network&nbsp;Names</i> or define your own if it is hidden.  You should also specify a WPA Password.  Note that WPA/WPA2 with a pre-shared key is the only authentication option supported by the configuration page.</li>",
+		"<li><i>Save</i> conifiguration changes and select <i>Interface&nbsp;Down&nbsp;/&nbsp;Interface&nbsp;Up</i> to restart the interface with new parameters.</li></ul>",
+		context_wifi = "<ul><li>For wireless networks you can select which network to use from the list of detected <i>Network&nbsp;Names</i> or define your own if it is hidden.  You should also specify a WPA Password.  Note that WPA/WPA2 with a pre-shared key is the only authentication option supported by the configuration page.</li></ul>",
 	},
 	['squeezelite'] = {
 		title = "Squeezelite Player Configuration and Control",
@@ -144,9 +144,9 @@ return {
 		"<li><i><b>Sample&nbsp;Rates</b></i> allows you to specify the sample rates supported by the device so that it does not need to be present when Squeezelite is started.  Ether specify a single <i>maximum</i> sample rate, specify the <i>minimum</i> and <i>maximum</i> rates separated by '-' (dash without spaces), or specify all supported rates separated by commas.</li>" ..
 		"<li><i><b>Resample</b></i> enables software resampling (upsampling) using the parameters specified. These are described in more detail <a href='/resample.html'>here</a>.</li>" ..
 		"<li>Select <i><b>Dop</b></i> to indicate that your DAC supports DSP over PCM (DoP) playback. You may also specify a delay in ms when switching between PCM and DoP modes.</i>" ..
-		"<li>Select <i><b>Visuliser</b></i> to enable support of the visuliser display within HDMI user interface.</li>",
+		"<li>Select <i><b>Visuliser</b></i> to enable support of the visuliser display within HDMI user interface.</li></ul>",
 		context_advanced = 
-		"<p><li><i><b>Advanced</b></i> options shows additional options which you will normally not need to adjust. These include logging which is used to help debug problems.</li>" ..
+		"<p><ul><li><i><b>Advanced</b></i> options shows additional options which you will normally not need to adjust. These include logging which is used to help debug problems.</li>" ..
 		"<li>Adjust <i><b>Log&nbsp;Level</b></i> to adjust the level of logging information written to the <i><b>Log&nbsp;File</b></i> and shown in the log window at the bottom of this page. Click in the log window to start and stop update of the log window. Common log level settings are:</li>" ..
 		"<ul><li>output=info</li><li>output=debug</li><li>decode=debug</li><li>all=debug</li></ul>" ..
 		"</ul>",
@@ -157,11 +157,11 @@ return {
 		context =
 		"<ul><li>The <i><b>Status</b></i> area at the top of the page shows the current status of the local Squeezebox Server which can run on your device.  It may be refreshed by pressing the <i>Refresh</i> button. The server can be <i>Enable</i>d, <i>Disable</i>d and <i>Restart</i>ed  using the respective buttons. The server will be reported as <i>active / running</i> if it is running correctly.</li>" ..
 		"<li>If you have already have a Squeezebox server running on a different machine, you do not need to enable this server.</li>" ..
-		"<li>Use the <i>SqueezeServer&nbsp;Web&nbsp;Interface</i> button to open a web session to the local Squeezebox Server if it is running.</li>",
+		"<li>Use the <i>SqueezeServer&nbsp;Web&nbsp;Interface</i> button to open a web session to the local Squeezebox Server if it is running.</li></ul>",
 	},
 	['storage'] = {
 		title = "Storage",
-		mounts = "Mounted File Systems",
+		mounts = "File Systems",
 		localfs = "Mount Local Disk",
 		remotefs = "Mount Network Share",
 		disk = "Disk",
@@ -172,8 +172,12 @@ return {
 		mountpoint = "Mountpoint",
 		type = "Type",
 		options = "Options",
-		mount = "Add",
-		unmount = "Remove",
+		add = "Add",
+		remove = "Remove",
+		unmount = "Unmount",
+		remount = "Remount",
+		active = "active",
+		inactive = "inactive",
 		mountpoint_tip = "Location where mount appears on device filesystem",
 		disk_tip = "Disk to mount",
 		network_tip = "Network share to mount",
@@ -186,7 +190,7 @@ return {
 		"<ul><li>Use this menu to attach (mount) local and remote disks to your device for use with the internal Squeezebox Server.</li>" ..
 		"<li>The <i><b>Mount&nbsp;Local&nbsp;Disk</b></i> section is used to attach local disks. Select one of the mountpoint options. This is the path where it will appear on the device file system. Select one of the disk options. You will not normally need to select the type of the disk as this is detected automatically from it's format.  Click <i>Add</i> to attach the disk to the device. If this is sucessful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown. If your disk has multiple partitions you may need to try each disk option in turn to find the correct one for your files.</li>" ..
 		"<li>The <i><b>Mount&nbsp;Network&nbsp;Share</b></i> section is used to attach network shares. Select one of the mountpoint options. Then add the network share location and select the type of network share.  For Windows (Cifs) shares you will also be asked for a username, password and domain. You may not need to include all of these details. Click <i>Add</i> to attach the disk to the device. If this is successful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown.</li>" ..
-		"<li>Mounted file systems will be re-attached when the device restarts if they are available.  To disconnect them click the <i>Remove</i> button alongside the mount entry in the <i>Mounted&nbsp;File&nbsp;Systems</i> area.</li>",
+		"<li>Mounted file systems will be re-attached when the device restarts if they are available.  To disconnect them click the <i>Remove</i> button alongside the mount entry in the <i>Mounted&nbsp;File&nbsp;Systems</i> area.</li></ul>",
 	},
 	['shutdown'] = {
 		title = "Shutdown: Reboot or Halt the device",
@@ -197,7 +201,7 @@ return {
 		reboot_desc = "To reboot the device.",
 		context =
 		"<ul><li>Use this menu to reboot or shutdown (halt) your device.</li>" ..
-		"<li>Please wait 30 seconds after halting the device before removing the power.</li>",
+		"<li>Please wait 30 seconds after halting the device before removing the power.</li></ul>",
 	},
 	['reboothalt'] = {
 		halting = "Device shutting down - please wait 30 seconds before removing power",

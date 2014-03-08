@@ -52,15 +52,15 @@ function remoteTypeCheck() {
 		<legend>{{{mounts}}}</legend>
 		{{#p_mounts}}
 		<div class="entry-nomargin">
-		  <div class="label">{{{p_mountp}}}</div>
-		  <div class="input">{{{p_spec}}} ({{{p_type}}})</div>
+		  <div class="label"><b>{{{p_mountp}}}</b></div>
+		  <div class="input">{{{p_spec}}} ({{{p_type}}}) <b>{{{p_active}}}</b></div>
 		</div>
 		<div class="entry-indent smaller">
 		  {{{p_opt}}}
 		</div>
 		<div class="entry submit">
-		  <input type="hidden" name="mountpoint" value="{{{p_mountp}}}">
-		  <input type="submit" id="mounts_unmount" name="mounts_unmount" value="{{{p_unmount_str}}}"/>
+		  <button type="submit" name="{{p_action}}" value={{{p_mountp}}}>{{{p_action_str}}}</button>
+		  <button type="submit" name="{{p_remove}}" value={{{p_mountp}}}>{{{p_remove_str}}}</button>
 		</div>
 		{{/p_mounts}}
 	  </fieldset>
@@ -108,7 +108,7 @@ function remoteTypeCheck() {
 	  </fieldset>
 	  <fieldset>
 		<div class="entry submit">
-		  <input type="submit" id="localfs_mount" name="localfs_mount" value="{{mount}}"/>
+		  <input type="submit" id="localfs_mount" name="localfs_mount" value="{{add}}"/>
 		</div>
 	  </fieldset>
 	</form>
@@ -171,7 +171,7 @@ function remoteTypeCheck() {
 	  </fieldset>
 	  <fieldset>
 		<div class="entry submit">
-		  <input type="submit" id="remotefs_mount" name="remotefs_mount" value="{{mount}}"/>
+		  <input type="submit" id="remotefs_mount" name="remotefs_mount" value="{{add}}"/>
 		</div>
 	  </fieldset>
 	</form>

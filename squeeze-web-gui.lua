@@ -725,16 +725,25 @@ function StorageHandler:_response(err)
 		t['p_error'] = err
 	end
 
+	local mounts = StorageConfig.get()
+	
+	table.sort(mounts, function(a, b) return a.mountp < b.mountp end)
+	
 	t['p_disks']       = _ids(StorageConfig.localdisks())
-	t['p_mountpoints'] = _ids(StorageConfig.mountpoints())
+	t['p_mountpoints'] = _ids(StorageConfig.mountpoints(mounts))
 	t['p_types_local'] = _ids({ '', 'fat', 'ntfs', 'ext2', 'ext3', 'ext4' })
 	t['p_types_remote']= _ids({ '', 'cifs', 'nfs', 'nfs4' })
-
-	local umount_str = strings['storage']['unmount']
-
-	for _, v in ipairs(StorageConfig.get()) do
+	
+	for _, v in ipairs(mounts) do
 		t['p_mounts'] = t['p_mounts'] or {}
-		table.insert(t['p_mounts'], { p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opts, p_perm = v.perm, p_unmount_str = umount_str })
+		table.insert(t['p_mounts'], {
+			p_spec = v.spec, p_mountp = v.mountp, p_type = v.type, p_opt = v.opts, p_perm = v.perm, p_act = v.active,
+			p_active = v.active and strings['storage']['active'] or strings['storage']['inactive'],
+			p_action = v.active and 'unmount' or 'remount',
+			p_remove = v.active and 'remove_act' or 'remove_inact',
+			p_action_str = v.active and strings['storage']['unmount'] or strings['storage']['remount'],
+			p_remove_str = strings['storage']['remove'],
+		})
 	end
 
 	setmetatable(t, { __index = strings['storage'] })
@@ -746,41 +755,47 @@ function StorageHandler:get()
 end
 
 function StorageHandler:post()
-	local spec = self:get_argument('spec', false)
-	local mountp = self:get_argument('mountpoint', false)
-	local type = self:get_argument('type', false)
-	local opts = self:get_argument('options', false)
+	local new_local   = self:get_argument('localfs_mount', false)
+	local new_remote  = self:get_argument('remotefs_mount', false)
+	local unmount     = self:get_argument('unmount', false)
+	local remount     = self:get_argument('remount', false)
+	local remove_act  = self:get_argument('remove_act', false)
+	local remove_inact= self:get_argument('remove_inact', false)
 	local err
 	
-	local type_map = { fat = 'vfat', ntfs = 'ntfs-3g' }
-	type = type_map[type] or type
-	
-	local new_local = self:get_argument('localfs_mount', false)
-	local new_remote= self:get_argument('remotefs_mount', false)
-	
-	if new_local then
-		opts = opts or "defaults"
-	end
-
-	if new_remote then
-		opts = opts or "defaults,_netdev"
-
-		if type == 'cifs' then
-			-- for cifs we must make sure that either credentials or guest is added to the option string else mount.cifs may block
-			local user = self:get_argument('user', false)
-			local pass = self:get_argument('pass', false)
-			local domain = self:get_argument('domain', false)
-			if user then
-				opts = opts .. ",credentials=" .. StorageConfig.cred_file(mountp, user, pass, domain)
-			else
-				opts = opts .. ",guest"
+	if new_local or new_remote then
+		
+		local spec = self:get_argument('spec', false)
+		local mountp = self:get_argument('mountpoint', false)
+		local type = self:get_argument('type', false)
+		local opts = self:get_argument('options', false)
+		
+		local type_map = { fat = 'vfat', ntfs = 'ntfs-3g' }
+		type = type_map[type] or type
+		
+		if new_local then
+			opts = opts or "defaults,nofail"
+		end
+		
+		if new_remote then
+			opts = opts or "defaults,_netdev"
+			
+			if type == 'cifs' then
+				-- for cifs we must make sure that either credentials or guest is added to the option string else mount.cifs may block
+				local user = self:get_argument('user', false)
+				local pass = self:get_argument('pass', false)
+				local domain = self:get_argument('domain', false)
+				if user then
+					opts = opts .. ",credentials=" .. StorageConfig.cred_file(mountp, user, pass, domain)
+				else
+					opts = opts .. ",guest"
+				end
 			end
 		end
-	end
-	
-	if new_local or new_remote then
+		
 		err = util.capture("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (opts and ("-o " .. opts .. " ") or "") ..
 						   spec .. " " .. mountp)
+		
 		-- if mount worked then persist, storing opts passed not those parsed from active mounts
 		if not err or err == "" then
 			local mounts = StorageConfig.get()
@@ -793,15 +808,24 @@ function StorageHandler:post()
 			end
 			StorageConfig.set(mounts)
 		end
+		
 	end
 	
-	if self:get_argument('mounts_unmount', false) and mountp then
-		util.execute("sudo umount " .. mountp)
+	if unmount or remove_act then
+		err = util.capture("sudo umount " .. (unmount or remove_act))
+	end
+	
+	if remount then
+		err = util.capture("sudo mount " .. remount)
+	end
+	
+	if remove_act or remove_inact then
 		-- remove mount from persited mounts
 		local mounts = StorageConfig.get()
+		local remove = remove_act or remove_inact
 		local i = 1
 		while mounts[i] do
-			if mountp == mounts[i].mountp then
+			if remove == mounts[i].mountp then
 				table.remove(mounts, i)
 				break
 			end
