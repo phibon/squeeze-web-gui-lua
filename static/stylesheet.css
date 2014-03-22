@@ -256,7 +256,7 @@ legend {
   white-space: nowrap;
 }
 .input {
-  width: 300px;
+  width: 317px;
   text-align: left;
   white-space: nowrap;
   font-weight: light;
@@ -265,6 +265,18 @@ legend {
   -webkit-box-sizing: border-box;
 }
 .input-check {
+}
+.input-4 {
+  width: 76px;
+}
+.input-3 {
+  width: 102px;
+}
+.input-2 {
+  width: 156px;
+}
+.input-34 {
+  width: 237px;
 }
 .color {
   color: blue;
@@ -298,3 +310,4 @@ li li {
   margin: 5px;
   padding: 5px;
 }
+

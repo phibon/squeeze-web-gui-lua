@@ -20,7 +20,7 @@
 -- You should have received a copy of the GNU General Public License
 -- along with squeeze-web-gui-lua. If not, see <http://www.gnu.org/licenses/>.
 
-local io, string, os, tonumber, tostring = io, string, os, tonumber, tostring
+local io, string, os, tonumber, tostring, ipairs = io, string, os, tonumber, tostring, ipairs
 local util, log = util, log
 
 module(...)
@@ -30,73 +30,86 @@ local configFileTmp = "/tmp/squeezelite.config"
 
 function params()
 	return {
-		'name', 'mac', 'rate', 'device', 'logfile', 'loglevel', 'priority', 'buffer', 'codec', 'alsa', 'other', 'server',
-		'dop', 'dop_params', 'resample', 'resample_params', 'vis'
+		'name', 'device', 'alsa_buffer', 'alsa_period', 'alsa_format', 'alsa_mmap',	'rate', 'rate_delay', 'dop', 'dop_delay',
+		'vis', 'resample',
+		'resample_recipe', 'resample_flags', 'resample_attenuation', 'resample_precision',
+		'resample_end', 'resample_start', 'resample_phase',
+		'loglevel_slimproto', 'loglevel_stream', 'loglevel_decode', 'loglevel_output',
+		'logfile', 'buffer_stream', 'buffer_output', 'codec', 'priority', 'mac', 'server', 'other'
 	}
 end
 
 function get()
-	local config = {}
+	local c = {}
 
 	local conf = io.open(configFile, "r")
 	if conf == nil then
 		log.error("unable to read: " .. configFile)
-		return config
+		return c
 	end
 
 	for line in conf:lines() do
 		if string.match(line, "NAME") then
-			config.name = string.match(line, '^NAME="%-n%s(.-)"')
-		end
-		if string.match(line, "MAC") then	
-			config.mac = string.match(line, '^MAC="%-m%s(.-)"')
-		end
-		if string.match(line, "MAX_RATE") then	
-			config.rate = string.match(line, '^MAX_RATE="%-r%s(.-)"')
+			c.name = string.match(line, '^NAME="%-n%s(.-)"')
 		end
 		if string.match(line, "AUDIO_DEV") then
-			config.device = string.match(line, '^AUDIO_DEV="%-o%s(.-)"')
-		end
-		if string.match(line, "BUFFER") then
-			config.buffer = string.match(line, '^BUFFER="%-b%s(.-)"')
-		end
-		if string.match(line, "CODEC") then
-			config.codec = string.match(line, '^CODEC="%-c%s(.-)"')
+			c.device = string.match(line, '^AUDIO_DEV="%-o%s(.-)"')
 		end
 		if string.match(line, "ALSA_PARAMS") then
-			config.alsa = string.match(line, '^ALSA_PARAMS="%-a%s(.-)"')
+			local alsa = (string.match(line, '^ALSA_PARAMS="%-a%s(.-)"') or "") .. ":::::"
+			c.alsa_buffer, c.alsa_period, c.alsa_format, c.alsa_mmap = string.match(alsa, "(.-):(.-):(.-):(.-):")
 		end
-		if string.match(line, "LOG_FILE") then
-			config.logfile = string.match(line, '^LOG_FILE="%-f%s(.-)"')
-		end
-		if string.match(line, "LOG_LEVEL") then
-			config.loglevel = string.match(line, '^LOG_LEVEL="%-d%s(.-)"')
-		end
-		if string.match(line, "PRIORITY") then
-			config.priority = string.match(line, '^PRIORITY="%-p%s(.-)"')
-		end
-		if string.match(line, "UPSAMPLE") then
-			config.resample = string.match(line, '^UPSAMPLE="%-u')
-			config.resample_params = string.match(line, '^UPSAMPLE="%-u%s(.-)"')
+		if string.match(line, "MAX_RATE") then	
+			local rate = string.match(line, '^MAX_RATE="%-r%s(.-)"') .. "::"
+			c.rate, c.rate_delay = string.match(rate, "(.-):(.-):")
 		end
 		if string.match(line, "DOP") then
-			config.dop = string.match(line, '^DOP="%-D')
-			config.dop_params = string.match(line, '^DOP="%-D%s(.-)"')
+			c.dop = string.match(line, '^DOP="%-D') and "1" or false
+			c.dop_delay = string.match(line, '^DOP="%-D%s(.-)"')
+		end
+		if string.match(line, "UPSAMPLE") then
+			c.resample = string.match(line, '^UPSAMPLE="%-u')
+			local params = (string.match(line, '^UPSAMPLE="%-u%s(.-)"') or "").. ":::::::"
+			c.resample_recipe, c.resample_flags, c.resample_attenuation, c.resample_precision, c.resample_end, c.resample_start,
+			c.resample_phase = string.match(params, "(.-):(.-):(.-):(.-):(.-):(.-):(.-):")
 		end
 		if string.match(line, "VISULIZER") then
-			config.vis = string.match(line, '^VISULIZER="%-v"')
+			c.vis = string.match(line, '^VISULIZER="%-v"') and true or false
 		end
-		if string.match(line, "OPTIONS") then
-			config.other = string.match(line, '^OPTIONS="(.-)"')
+		if string.match(line, "LOG_LEVEL") then
+			local loglevel = (string.match(line, '^LOG_LEVEL="%-d%s(.-)"') or "") .. " "
+			c.loglevel_slimproto = string.match(loglevel, "slimproto=(.-)%s")
+			c.loglevel_stream    = string.match(loglevel, "stream=(.-)%s")
+			c.loglevel_decode    = string.match(loglevel, "decode=(.-)%s")
+			c.loglevel_output    = string.match(loglevel, "output=(.-)%s")
+		end
+		if string.match(line, "LOG_FILE") then
+			c.logfile = string.match(line, '^LOG_FILE="%-f%s(.-)"')
+		end
+		if string.match(line, "BUFFER") then
+			local buffer = (string.match(line, '^BUFFER="%-b%s(.-)"') or "") .. "::"
+			c.buffer_stream, c.buffer_output = string.match(buffer, "(.-):(.-):")
+		end
+		if string.match(line, "CODEC") then
+			c.codec = string.match(line, '^CODEC="%-c%s(.-)"')
+		end
+		if string.match(line, "PRIORITY") then
+			c.priority = string.match(line, '^PRIORITY="%-p%s(.-)"')
+		end
+		if string.match(line, "MAC") then	
+			c.mac = string.match(line, '^MAC="%-m%s(.-)"')
 		end
 		if string.match(line, "SERVER_IP") then
-			config.server = string.match(line, '^SERVER_IP="%-s%s(.-)"')
+			c.server = string.match(line, '^SERVER_IP="%-s%s(.-)"')
+		end
+		if string.match(line, "OPTIONS") then
+			c.other = string.match(line, '^OPTIONS="(.-)"')
 		end
 	end
 
 	conf:close()
 
-	return config
+	return c
 end
 
 local function commalist(str, regexp)
@@ -114,9 +127,36 @@ end
 
 function validate(c)
 	-- return error token or nil
-	-- may change config for automagic...
-	if c.name and string.match(c.name, "^(.-)%s") then
-		c.name = string.match(c.name, "^(.-)%s")
+	-- may change c for automagic...
+	if c.name and string.match(c.name, "^(.-)%s*$") then
+		c.name = string.match(c.name, "^(.-)%s*$")
+	end
+	-- ints
+	for _, v in ipairs({ 'alsa_buffer', 'alsa_period', 'rate_delay', 'dop_delay', 'buffer_stream', 'buffer_output',
+						 'resample_precision' }) do
+		if c[v] and not string.match(c[v], "^%d+$") then
+			return v
+		end
+	end
+	-- float
+	for _, v in ipairs({ 'resample_attenuation' }) do
+		if c[v] and not (string.match(c[v], "^%d+$") or string.match(c[v], "^%d+%.%d+$")) then
+			return v
+		end
+	end
+	-- percent
+	for _, v in ipairs({ 'resample_end', 'resample_start', 'resample_phase' }) do
+		if c[v] and not	((string.match(c[v], "^%d+$") or string.match(c[v], "^%d+%.%d+$")) and tonumber(c[v]) >= 0 and tonumber(c[v]) <= 100) then
+			return v
+		end
+	end
+	-- hex
+	if c.resample_flags and not string.match(c.resample_flags, "^%x+$") then
+		return 'resample_flags'
+	end
+	-- stopband should start after passband has ended
+	if c.resample_start and c.resample_end and tonumber(c.resample_start) < tonumber(c.resample_end) then
+		return 'resample_endstart'
 	end
 	if c.mac and not string.match(c.mac, "%x%x:%x%x:%x%x:%x%x:%x%x:%x%x") then
 		return 'mac'
@@ -127,56 +167,67 @@ function validate(c)
 	if c.rate and not (string.match(c.rate, "^%d+$") or string.match(c.rate, "^%d+%-%d+$") or commalist(c.rate,"%d+")) then
 		return 'rate'
 	end
-	if c.buffer and not (string.match(c.buffer, "^%d+$") or string.match(c.buffer, "^%d+:%d+$")) then
-		return 'buffer'
-	end
 	if c.codec and not commalist(c.codec, "%l+") then
 		return 'codec'
-	end
-	if c.alsa and not (string.match(c.alsa, "^%d+") or string.match(c.alsa, "^%d-:%d-$") or string.match(c.alsa, "^%d-:%d-:.-$") or 
-					   string.match(c.alsa, "^%d-:%d-:.-:%d$") or string.match(c.alsa, "^%d-:%d-:.-:%d-:%d$")) then
-		return 'alsa'
-	end
-	if c.loglevel and not string.match(c.loglevel, "^%l+=%l+$") then
-		return 'loglevel'
 	end
 	if c.server and not (string.match(c.server, "^%d+%.%d+%.%d+%.%d+$") or c.server == '^localhost$') then
 		return 'server'
 	end
-	-- add resample param validation?
-	if c.dop_params and not string.match(c.dop_params, "^%d+$") then
-		return 'dop_params'
-	end
 	return nil
 end
 
-function set(config)
+function set(c)
 	local outconf = io.open(configFileTmp, "w")
 
 	if outconf then
+		local alsa, rate, buffer, resample_params, loglevel
+
+		if c.alsa_buffer or c.alsa_period or c.alsa_format or c.alsa_mmap then
+			alsa = (c.alsa_buffer or "") .. ":" .. (c.alsa_period or "") .. ":" .. (c.alsa_format or "") .. ":" .. (c.alsa_mmap or "")
+		end
+		if c.rate or c.rate_delay then
+			rate = (c.rate or "") .. ":" .. (c.rate_delay or "")
+		end
+		if c.buffer_stream or c.buffer_output then
+			buffer = (c.buffer_stream or "") .. ":" .. (c.buffer_output or "")
+		end
+		if c.resample_recipe or c.resample_flags or c.resample_attenuation or c.resample_precision or c.resample_end or c.resample_start
+			or c.resample_phase then
+			resample_params = 
+				(c.resample_recipe or "") .. ":" .. (c.resample_flags or "") .. ":" .. (c.resample_attenuation or "") .. ":" ..
+				(c.resample_precision or "") .. ":" .. (c.resample_end or "") .. ":" .. (c.resample_start or "") .. ":" .. 
+				(c.resample_phase or "")
+		end
+		for _, v in ipairs({ "slimproto", "stream", "decode", "output" }) do
+			if c["loglevel_" .. v] then
+				loglevel = (loglevel and (loglevel .. " ") or "") .. "-d " .. v .. "=" .. c["loglevel_" .. v]
+			end
+		end
+
 		outconf:write("# created by squeeze-web-gui-lua " .. os.date() .. "\n")
 
-		if config.name     then outconf:write('NAME="-n ' .. config.name .. '"\n') end
-		if config.mac      then outconf:write('MAC="-m ' .. config.mac .. '"\n') end
-		if config.priority then outconf:write('PRIORITY="-p ' .. config.priority .. '"\n') end
-		if config.rate     then outconf:write('MAX_RATE="-r ' .. config.rate .. '"\n') end
-		if config.device   then outconf:write('AUDIO_DEV="-o ' .. config.device .. '"\n') end
-		if config.buffer   then outconf:write('BUFFER="-b ' .. config.buffer .. '"\n') end
-		if config.codec    then outconf:write('CODEC="-c ' .. config.codec .. '"\n') end
-		if config.alsa     then outconf:write('ALSA_PARAMS="-a ' .. config.alsa .. '"\n') end
-		if config.logfile  then outconf:write('LOG_FILE="-f ' .. config.logfile .. '"\n') end
-		if config.loglevel then outconf:write('LOG_LEVEL="-d ' .. config.loglevel .. '"\n') end
-		if config.vis      then outconf:write('VISULIZER="-v"\n') end
-		if config.server   then outconf:write('SERVER_IP="-s ' .. config.server .. '"\n') end
-		if config.other    then outconf:write('OPTIONS="' .. config.other .. '"\n') end
-		if config.resample_params then
-			outconf:write('UPSAMPLE="-u ' .. config.resample_params .. '"\n')
-		elseif config.resample then
+		if c.name     then outconf:write('NAME="-n ' .. c.name .. '"\n') end
+		if c.device   then outconf:write('AUDIO_DEV="-o ' .. c.device .. '"\n') end
+		if alsa       then outconf:write('ALSA_PARAMS="-a ' .. alsa .. '"\n') end
+		if rate       then outconf:write('MAX_RATE="-r ' .. rate .. '"\n') end
+		if buffer     then outconf:write('BUFFER="-b ' .. buffer .. '"\n') end
+		if c.mac      then outconf:write('MAC="-m ' .. c.mac .. '"\n') end
+		if c.priority then outconf:write('PRIORITY="-p ' .. c.priority .. '"\n') end
+		if c.buffer   then outconf:write('BUFFER="-b ' .. c.buffer .. '"\n') end
+		if c.codec    then outconf:write('CODEC="-c ' .. c.codec .. '"\n') end
+		if c.logfile  then outconf:write('LOG_FILE="-f ' .. c.logfile .. '"\n') end
+		if loglevel   then outconf:write('LOG_LEVEL="' .. loglevel .. '"\n') end
+		if c.vis      then outconf:write('VISULIZER="-v"\n') end
+		if c.server   then outconf:write('SERVER_IP="-s ' .. c.server .. '"\n') end
+		if c.other    then outconf:write('OPTIONS="' .. c.other .. '"\n') end
+		if c.resample and resample_params then
+			outconf:write('UPSAMPLE="-u ' .. resample_params .. '"\n')
+		elseif c.resample then
 			outconf:write('UPSAMPLE="-u"\n')
 		end
-		if config.dop_params then
-			outconf:write('DOP="-D ' .. config.dop_params .. '"\n')
-		elseif config.dop then
+		if c.dop and c.dop_delay then
+			outconf:write('DOP="-D ' .. c.dop_delay .. '"\n')
+		elseif c.dop then
 			outconf:write('DOP="-D"\n')
 		end
 		

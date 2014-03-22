@@ -30,7 +30,7 @@ function startstop_log(action) {
     log_xhr = null;
   }
 }
-function show(track, show1, show2, show3) {
+function show_advanced(track, show1, show2, show3) {
   if (document.getElementById(track).checked) {
     document.getElementById(show1).style.display = '';
     document.getElementById(show2).style.display = '';
@@ -41,6 +41,15 @@ function show(track, show1, show2, show3) {
     document.getElementById(show2).style.display = 'none';
     document.getElementById(show3).style.display = 'none';
     startstop_log('stop')
+  }
+}
+function show_resample(track, show1, show2) {
+  if (document.getElementById(track).checked) {
+    document.getElementById(show1).style.display = '';
+    document.getElementById(show2).style.display = '';
+  } else {
+    document.getElementById(show1).style.display = 'none';
+    document.getElementById(show2).style.display = 'none';
   }
 }
 {{#p_advanced}}
@@ -82,6 +91,9 @@ window.onload = function() {
 	</div>
 	<div class="help-text">
 	  {{{context}}}
+	  <div id="context-resample" {{^p_resample}} style="display: none" {{/p_resample}}>
+		{{{context_resample}}}
+	  </div>
 	  <div id="context-advanced" {{^p_advanced}} style="display: none" {{/p_advanced}}>
 		{{{context_advanced}}}
 	  </div>
@@ -95,11 +107,11 @@ window.onload = function() {
 	  <legend>{{{status}}}</legend>
 	  <div class="entry-nomargin">
 		<div class="label">{{{status}}}</div>
-		<div class="input">{{{p_status}}}</div>
+		<div class="input"><b>{{{p_status}}}</b></div>
 	  </div>
 	  <div class="entry-nomargin">
 		<div class="label">{{{active}}}</div>
-		<div class="input">{{{p_active}}}</div>
+		<div class="input"><b>{{{p_active}}}</b></div>
 	  </div>
 	</fieldset>
 	
@@ -109,16 +121,8 @@ window.onload = function() {
 		  <input type="submit" id="refresh" name="refresh" value="{{refresh}}"/>
 		  <input type="submit" id="enable" name="enableAndStart" value="{{enable}}"/>
 		  <input type="submit" id="disable" name="disableAndStop" value="{{disable}}"/>
-		  <!--input type="submit" id="start" name="start" value="{{start}}"/>
-		  <input type="submit" id="stop" name="stop" value="{{stop}}"/-->
 		  <input type="submit" id="restart" name="restart" value="{{restart}}"/>
-		  <!--input type="submit" id="enableAndStart" name="enableAndStart" value="{{{enable_start}}}"/>
-		  <input type="submit" id="disableAndStop" name="disableAndStop" value="{{{disable_stop}}}"/-->
 		</div>
-		<!--div class="submit">
-		  <input type="submit" id="enableAndStart" name="enableAndStart" value="{{{enable_start}}}"/>
-		  <input type="submit" id="disableAndStop" name="disableAndStop" value="{{{disable_stop}}}"/>
-		</div-->
 	  </fieldset>
 	</form>
 	
@@ -145,33 +149,48 @@ window.onload = function() {
 		  </div>
 		</div>
 		<div class="entry">
-		  <div class="features simptip-position-right simptip-multiline simptip-smooth" data-tooltip="{{{alsa_tip}}}">
-			<label for="alsa" class="label">{{{alsa}}}</label>
-			<input class="input" type="text" name="alsa" value="{{{p_alsa}}}" id="alsa" />
+		  <label for="alsa" class="label">{{{alsa}}}</label>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{alsa_buffer_tip}}}">
+			<input class="input input-4" type="text" name="alsa_buffer" value="{{{p_alsa_buffer}}}" id="alsa_buffer" />
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{alsa_period_tip}}}">
+			<input class="input input-4" type="text" name="alsa_period" value="{{{p_alsa_period}}}" id="alsa_period" />
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{alsa_format_tip}}}">
+			<select class="input input-4" name="alsa_format" id="alsa_format">
+			  {{#p_alsa_format}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_alsa_format}}
+			</select>
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{alsa_mmap_tip}}}">
+			<select class="input input-4" name="alsa_mmap" id="alsa_mmap">
+			  {{#p_alsa_mmap}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_alsa_mmap}}
+			</select>
 		  </div>
 		</div>
 		<div class="entry">
-		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{rate_tip}}}">
-			<label for="rate" class="label">{{{rate}}}</label>
-			<input class="input" type="text" name="rate" value="{{{p_rate}}}" id="rate" />
+		  <label for="rate" class="label">{{{rate}}}</label>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{rate_tip}}}">
+			<input class="input input-34" type="text" name="rate" value="{{{p_rate}}}" id="rate" />
 		  </div>
-		</div>
-		<div class="entry">
-		  <label for="resample" class="label">{{{resample}}}</label>
-		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_tip}}}">
-			<input class="input-check" type="checkbox" name="resample" value="true" {{{p_resample_checked}}} id="resample"/>
-		  </div>
-		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{resample_params_tip}}}">
-			<input type="text" class="text" name="resample_params" value="{{{p_resample_params}}}" id="resample_params"/>
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{rate_delay_tip}}}">
+			<input class="input input-4" type="text" name="rate_delay" value="{{{p_rate_delay}}}" id="rate_delay" />
 		  </div>
 		</div>
 		<div class="entry">
 		  <label for="dop" class="label">{{{dop}}}</label>
 		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{dop_tip}}}">
-			<input class="input-check" type="checkbox" name="dop" value="true" {{{p_dop_checked}}} id="dop"/>
+			<select class="input input-34" name="dop" id="dop">
+			  {{#p_dop}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_dop}}
+			</select>
 		  </div>
-		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{dop_params_tip}}}">
-			<input type="text" class="text" name="dop_params" value="{{{p_dop_params}}}" id="dop_params"/>
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{dop_delay_tip}}}">
+			<input class="input input-4" type="text" name="dop_delay" value="{{{p_dop_delay}}}" id="dop_delay" />
 		  </div>
 		</div>
 	  </fieldset>
@@ -184,18 +203,122 @@ window.onload = function() {
 		  </div>
 		</div>
 		<div class="entry">
+		  <label for="resample" class="label">{{{resample}}}</label>
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{resample_tip}}}">
+			<input class="input-check" type="checkbox" name="resample" value="true" {{{p_resample_checked}}} id="resample"
+				   onclick="javascript:show_resample('resample', 'resample_fieldset', 'context-resample');" />
+		  </div>
+		</div>
+		<div class="entry">
 		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{advanced_tip}}}">
 			<label for="adv" class="label">{{{advanced}}}</label>
 			<input class="input-check" type="checkbox" name="advanced" value="true" {{{p_advanced}}} id="adv"
-				   onclick="javascript:show('adv','advanced','log', 'context-advanced');" />
+				   onclick="javascript:show_advanced('adv','advanced_fieldset','log', 'context-advanced');" />
 		  </div>
 		</div>
 	  </fieldset>
-	  <fieldset id="advanced" {{^p_advanced}} style="display: none" {{/p_advanced}}>
+	  <fieldset id="resample_fieldset" {{^p_resample}} style="display: none" {{/p_resample}}>
+		<legend>{{{resample}}}</legend>
 		<div class="entry">
-		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{loglevel_tip}}}">
-			<label for="loglevel" class="label">{{{loglevel}}}</label>
-			<input class="input" type="text" name="loglevel" value="{{{p_loglevel}}}" id="loglevel" />
+		  <label for="resample_quality" class="label">{{{resample_recipe}}}</label>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_quality_tip}}}">
+			<select class="input input-3" name="resample_quality" id="resample_quality" >
+			  {{#p_resample_quality}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_resample_quality}}
+			</select>
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_filter_tip}}}">
+			<select class="input input-3" name="resample_filter" id="resample_filter">
+			  {{#p_resample_filter}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_resample_filter}}
+			</select>
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_steep_tip}}}">
+			<select class="input input-3" name="resample_steep" id="resample_filter">
+			  {{#p_resample_steep}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_resample_steep}}
+			</select>
+		  </div>
+		</div>
+		<div class="entry">
+		  <label for="resample_flags" class="label">{{{resample_options}}}</label>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_flags_tip}}}">
+			<input class="input input-3" type="text" name="resample_flags" value="{{{p_resample_flags}}}" 
+				   placeholder="{{{flags}}}" id="resample_flags" />
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_attenuation_tip}}}">
+			<input class="input input-3" type="text" name="resample_attenuation" value="{{{p_resample_attenuation}}}" 
+				   placeholder="{{{attenuation}}}" id="resample_attenuation" />
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_precision_tip}}}">
+			<input class="input input-3" type="text" name="resample_precision" value="{{{p_resample_precision}}}" 
+				   placeholder="{{{precision}}}" id="resample_precision" />
+		  </div>
+		</div>
+		<div class="entry">
+		  <label for="resample_end" class="label">&nbsp;</label>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_end_tip}}}">
+			<input class="input input-3" type="text" name="resample_end" value="{{{p_resample_end}}}" 
+				   placeholder="{{{pass_end}}}" id="resample_end" />
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_start_tip}}}">
+			<input class="input input-3" type="text" name="resample_start" value="{{{p_resample_start}}}" 
+				   placeholder="{{{stop_start}}}" id="resample_start" />
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{resample_phase_tip}}}">
+			<input class="input input-3" type="text" name="resample_phase" value="{{{p_resample_phase}}}" 
+				   placeholder="{{{phase}}}" id="resample_phase" />
+		  </div>
+		</div>
+		<div class="entry">
+		  <label for="resample_async" class="label">{{{async}}}</label>
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{resample_async_tip}}}">
+			<input class="input-check" type="checkbox" name="resample_async" value="true" {{{p_resample_async_checked}}}
+				   id="resample_async" />
+		  </div>
+		</div>
+		<div class="entry">
+		  <label for="resample_exception" class="label">{{{exception}}}</label>
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{resample_exception_tip}}}">
+			<input class="input-check" type="checkbox" name="resample_exception" value="true" {{{p_resample_exception_checked}}}
+				   id="resample_exception" />
+		  </div>
+		</div>
+	  </fieldset>
+	  <fieldset id="advanced_fieldset" {{^p_advanced}} style="display: none" {{/p_advanced}}>
+		<legend>{{{advanced}}}</legend>
+		<div class="entry">
+		  <label for="loglevel" class="label">{{{loglevel}}}</label>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{loglevel_slimproto_tip}}}">
+			<select class="input input-4" name="loglevel_slimproto" id="loglevel_slimproto">
+			  {{#p_loglevel_slimproto}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_loglevel_slimproto}}
+			</select>
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{loglevel_stream_tip}}}">
+			<select class="input input-4" name="loglevel_stream" id="loglevel_stream">
+			  {{#p_loglevel_stream}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_loglevel_stream}}
+			</select>
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{loglevel_decode_tip}}}">
+			<select class="input input-4" name="loglevel_decode" id="loglevel_decode">
+			  {{#p_loglevel_decode}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_loglevel_decode}}
+			</select>
+		  </div>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{loglevel_output_tip}}}">
+			<select class="input input-4" name="loglevel_output" id="loglevel_output">
+			  {{#p_loglevel_output}}
+			  <option value="{{{val}}}" {{{selected}}}>{{{desc}}}</option>
+			  {{/p_loglevel_output}}
+			</select>
 		  </div>
 		</div>
 		<div class="entry">
@@ -204,16 +327,13 @@ window.onload = function() {
 			<input class="input" type="text" name="logfile" value="{{{p_logfile}}}" id="logfile" />
 		  </div>
 		</div>
-		<div class="entry">
-		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{priority_tip}}}">
-			<label for="priority" class="label">{{{priority}}}</label>
-			<input class="input" type="text" name="priority" value="{{{p_priority}}}" id="priority" />
+		<!--div class="entry">
+		  <label for="buffer" class="label">{{{buffer}}}</label>
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{buffer_stream_tip}}}">
+			<input class="input input-2" type="text" name="buffer_stream" value="{{{p_buffer_stream}}}" id="buffer_stream" />
 		  </div>
-		</div>
-		<div class="entry">
-		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{buffer_tip}}}">
-			<label for="buffer" class="label">{{{buffer}}}</label>
-			<input class="input" type="text" name="buffer" value="{{{p_buffer}}}" id="priority" />
+		  <div class="features simptip-position-bottom simptip-smooth" data-tooltip="{{{buffer_output_tip}}}">
+			<input class="input input-2" type="text" name="buffer_output" value="{{{p_buffer_output}}}" id="buffer_output" />
 		  </div>
 		</div>
 		<div class="entry">
@@ -222,6 +342,12 @@ window.onload = function() {
 			<input class="input" type="text" name="codec" value="{{{p_codec}}}" id="codec" />
 		  </div>
 		</div>
+		<div class="entry">
+		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{priority_tip}}}">
+			<label for="priority" class="label">{{{priority}}}</label>
+			<input class="input" type="text" name="priority" value="{{{p_priority}}}" id="priority" />
+		  </div>
+		</div-->
 		<div class="entry">
 		  <div class="features simptip-position-right simptip-smooth" data-tooltip="{{{mac_tip}}}">
 			<label for="mac" class="label">{{{mac}}}</label>

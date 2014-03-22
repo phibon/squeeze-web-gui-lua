@@ -277,7 +277,6 @@ local SqueezeserverHandler = class("SqueezeserverHandler", PageHandler)
 local StorageHandler     = class("StorageHandler", PageHandler)
 local ShutdownHandler    = class("ShutdownHandler", PageHandler)
 local FaqHandler         = class("FaqHandler", PageHandler)
-local ResampleHandler    = class("ResampleHandler", PageHandler)
 local LogHandler         = class("LogHandler", turbo.web.RequestHandler)
 
 ------------------------------------------------------------------------------------------
@@ -577,6 +576,20 @@ end
 
 ------------------------------------------------------------------------------------------
 
+function _sel(param, strings, entries, contains)
+	local t = {}
+	local sel
+	for _, entry in ipairs(entries) do
+		for k, v in pairs (entry) do
+			local selected = contains and string.match(param or "", k) or (param == k)
+			sel = sel or selected
+			t[#t+1] = { val = k, desc = strings[v] or v, selected = (selected and "selected" or "") }
+		end
+	end
+	table.insert(t, 1, { val = "", desc = "", selected = sel and "" or "selected" })
+	return t
+end
+
 -- squeezelite.html
 function SqueezeliteHandler:_response(err)
 	local config = SqueezeliteConfig.get()
@@ -590,9 +603,29 @@ function SqueezeliteHandler:_response(err)
 		t["p_"..v] = config[v]
 	end
 	t['p_resample_checked'] = config.resample and "checked" or ""
-	t['p_dop_checked']      = config.dop and "checked" or ""
 	t['p_vis_checked']      = config.vis and "checked" or ""
-	t['p_advanced'] = self:get_argument('advanced', false) and "checked" or nil
+	t['p_advanced']         = self:get_argument('advanced', false) and "checked" or nil
+
+	t['p_resample_async_checked']     = string.match(config.resample_recipe or "", "X") and "checked" or ""
+	t['p_resample_exception_checked'] = string.match(config.resample_recipe or "", "E") and "checked" or ""
+
+	-- select options require table per entry, update param with more details of options
+	t['p_alsa_format']      = _sel(config.alsa_format, strings['squeezelite'],
+								   { { ["16"] = "bit_16" }, { ["24"] = "bit_24" }, { ["24_3"] = "bit_24_3"} , { ["32"] = "bit_32" } })
+	t['p_alsa_mmap']        = _sel(config.alsa_mmap, strings['squeezelite'], { { ["0"] = "mmap_off" }, { ["1"] = "mmap_on" } })
+	t['p_dop']              = _sel(config.dop, strings['squeezelite'], { { ["1"] = "dop_supported" } })
+	t['p_resample_quality'] = _sel(config.resample_recipe, strings['squeezelite'], 
+								   { { ["v"] = "very_high" }, { ["h"] = "high" }, { ["m"] = "medium" }, { ["l"] = "low" },
+									 { ["q"] = "quick" } }, true)
+	t['p_resample_filter']  = _sel(config.resample_recipe, strings['squeezelite'], 
+								   { { ["L"] = "linear" }, { ["I"] = "intermediate" }, { ["M"] = "minimum" } }, true)
+	t['p_resample_steep']   = _sel(config.resample_recipe, strings['squeezelite'], 
+								   { { ["s"] = "steep" } }, true)
+
+	for _, v in ipairs({ "slimproto", "stream", "decode", "output" }) do
+		t['p_loglevel_' .. v] = _sel(config['loglevel_' .. v], strings['squeezelite'], 
+									 { { ["info"] = "info" }, { ["debug"] = "debug" }, { ["sdebug"] = "trace" } })
+	end
 
 	local status = util.capture('systemctl status squeezelite.service')
 	if status then
@@ -621,7 +654,7 @@ function SqueezeliteHandler:_response(err)
 	local inc = {}
 	if device_info then
 		for line in string.gmatch(device_info, "(.-)\n") do
-			local id = string.match(line, "%s-(.-)%s-%-")
+			local id = string.match(line, "%s*(.-)%s-%-")
 			if id then
 				id = string.gsub(id, "sysdefault:", "hw:")  -- replace sysdefault:* with hw:*
 				id = string.gsub(id, "default:", "hw:")     -- replace default:* with hw:*
@@ -653,6 +686,10 @@ function SqueezeliteHandler:post()
 		for _, v in ipairs(SqueezeliteConfig.params()) do
 			config[v] = self:get_argument(v, false)
 		end
+		config.resample_recipe = self:get_argument("resample_quality", "") .. self:get_argument("resample_filter", "") .. 
+			self:get_argument("resample_steep", "") .. 
+			(self:get_argument("resample_async", false) and "X" or "") .. 
+			(self:get_argument("resample_exception", false) and "E" or "")
 
 		local err = SqueezeliteConfig.validate(config)
 		if err then
@@ -869,13 +906,6 @@ end
 
 ------------------------------------------------------------------------------------------
 
--- resample.html
-function ResampleHandler:get()
-	self:renderResult('resample.html', strings['resample'])
-end
-
-------------------------------------------------------------------------------------------
-
 -- log handler
 function LogHandler:get(log)
 	local stream = self:get_argument('stream', false)
@@ -938,7 +968,6 @@ turbo.web.Application({
     { "^/storage%.html$", StorageHandler },
     { "^/shutdown%.html$", ShutdownHandler },
     { "^/faq%.html$", FaqHandler },
-    { "^/resample%.html$", ResampleHandler },
     { "^/(.-)%.log$", LogHandler },
 	{ "^/static/(.*)$", turbo.web.StaticFileHandler, static_path },
 }):listen(PORT)

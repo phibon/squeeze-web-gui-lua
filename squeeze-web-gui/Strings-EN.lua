@@ -93,63 +93,138 @@ return {
 		loglevel = "Log Level",
 		priority = "RT Thread Priority",
 		buffer = "Buffer",
-		codec = "Codec",
+		codec = "Codecs",
 		alsa = "Alsa Params",
 		resample = "Resample",
 		dop = "DoP",
 		vis = "Visuliser", 
 		other = "Other Options",
 		server = "Server IP Address",
-		advanced = "(Advanced)",
+		advanced = "Advanced",
+		
+		bit_16 = "16 bit",
+		bit_24 = "24 bit",
+		bit_24_3 = "24_3 bit",
+		bit_32 = "32 bit",
+		mmap_off = "No MMAP",
+		mmap_on = "MMAP",
+		dop_supported = "Device supports DoP",
+
 		name_tip = "Player name (optional)",
-		mac_tip = "Player mac address, format: ab:cd:ef:12:34:56 (optional)",
 		device_tip = "Select output device",
-		rate_tip = "Rates supported by device, format: <maxrate> | <minrate>-<maxrate> | <rate1>,<rate2>,<rate3> (optional)",
-		logfile_tip = "Write debug output to specified file",
-		loglevel_tip = "Logging level, format: <log>=<level>, logs: all|slimproto|stream|decode|output, levels=info|debug|sdebug",
-		priority_tip = "RT thread priority (1-99) (optional)",
-		codec_tip = "Restrict codecs loaded, format: codec1, codec2, codec3 (optional)",
-		buffer_tip = "Set buffer size, format: <stream buffer>:<output buffer> in Kbytes (optional)",
-		alsa_tip = "Alsa parameters, format: <b>:<p>:<f>:<m>, b = buffer time in ms or size in bytes, p = period count or size in bytes, f sample format (16|24|24_3|32), m = use mmap (0|1) (optional)",
-		resample_tip = "Enable resampling",
+		alsa_buffer_tip = "Alsa buffer size in ms or bytes (optional)",
+		alsa_period_tip = "Alsa period count or size in bytes (optional)",
+		alsa_format_tip = "Alsa sample format (optional)",
+		alsa_mmap_tip = "Alsa MMAP support (optional)",
+		rate_tip = "Max sample rate supported or comma separated list of sample rates (optional)",
+		rate_delay_tip = "Delay when switching between sample rates in ms (optional)",
 		dop_tip = "Enable DSD over PCM (DoP)",
-		resample_params_tip = "Resampling parameters",
-		dop_params_tip = "Delay when switching between PCM and DoP (ms)",
-		vis_tip= "Enable Visulizer display in Jivelite",
-		other_tip = "Other optional configuration parameters",
-		server_tip = "Server IP address (optional)",
+		dop_delay_tip = "Delay when switching between PCM and DoP in ms (optional)",
+
 		advanced_tip = "Show advanced options",
-		error_mac = "Error setting MAC Address",
+		resample_tip = "Enable resampling",
+		vis_tip= "Enable Visuliser display in Jivelite",
+
+		resample_recipe = "Soxr Recipe",
+		resample_options = "Soxr Options",
+		very_high = "Very High",
+		high = "High",
+		medium = "Medium",
+		low = "Low",
+		quick = "Quick",
+		linear = "Linear Phase",
+		intermediate = "Intermediate Phase",
+		minimum = "Minimum Phase",
+		steep = "Steep Filter",
+
+		resample_options = "Soxr Options",
+		flags = "Flags",
+		attenuation = "Attenuation",
+		precision = "Precision",
+		pass_end = "Passband End",
+		stop_start = "Stopband Start",
+		phase = "Phase",
+		async = "Asynchronous",
+		exception = "By Exception",
+
+		resample_quality_tip = "Resampling Quality (higher quality uses more processing power)",
+		resample_filter_tip = "Resampling Filter type",
+		resample_steep_tip = "Use Steep filter",
+		resample_flags_tip = "Resampling flags (hexadecimal integer), advanced use only",
+		resample_attenuation_tip = "Attenuation in dB to apply to avoid clipping (defaults to 1dB if not set)",
+		resample_precision_tip = "Bits of precision, (HQ = 20, VHQ = 28)",
+		resample_end_tip = "Passband end as percentage (Nyquist = 100%)",
+		resample_start_tip = "Stopband start as percentage (must be greater than passband end)",
+		resample_phase_tip = "Phase response (0 = minimum, 50 = linear, 100 = maximum)",
+		resample_async_tip = "Resample asynchronously to maximum sample rate (otherwise resamples to max synchronous rate)",
+		resample_exception_tip = "Resample only when desired sample rate is not supported by ouput device",
+
+		info = "Info",
+		debug = "Debug",
+		trace = "Trace",
+
+		loglevel_slimproto_tip = "Slimproto control session logging level",
+		loglevel_stream_tip = "Streaming logging level",
+		loglevel_decode_tip = "Decode logging level",
+		loglevel_output_tip = "Output logging level",
+		logfile_tip = "Write debug output to specified file",
+		buffer_stream_tip = "Stream buffer size in Kbytes (optional)",
+		buffer_output_tip = "Output buffer size in Kbytes (optional)",
+		codec_tip = "Comma separated list of codecs to load (optional - loads all codecs if not set)",
+		priority_tip = "RT thread priority (1-99) (optional)",
+		mac_tip = "Player mac address, format: ab:cd:ef:12:34:56 (optional)",
+ 		server_tip = "Server IP address (optional)",
+		other_tip = "Other optional configuration parameters",
+
+		error_alsa_buffer = "Error setting Alsa buffer",
+		error_alsa_period = "Error setting Alsa period",
+		error_rate = "Error setting sample rate",
+		error_rate_delay = "Error setting sample rate change delay",
+		error_dop_delay = "Error setting DoP delay",
+		error_resample_precision = "Error setting ressample precision",
+		error_resample_attenuation = "Error setting ressample attenuation",
+		error_resample_start = "Error setting resample stopband start",
+		error_resample_end = "Error setting resample stopband",
+		error_resample_endstart = "Error setting resampling parameters - passband end should not overlap stopband start",
+		error_resample_phase = "Error setting resample phase response",
+		error_buffer_stream = "Error setting stream buffer size",
+		error_buffer_output = "Error setting output buffer size",
+		error_codec = "Error setting Codecs",
 		error_priority = "Error setting RT Thread Priority",
-		error_rate = "Error setting Rate",
-		error_buffer = "Error setting Buffer",
-		error_code = "Error setting Codec",
-		error_alsa = "Error setting Alsa Params",
-		error_loglevel = "Error setting Log Level",
+		error_mac = "Error setting MAC Address",
 		error_server = "Error settting Server",
-		error_dop_params = "Error setting DoP Params",
+
 		context = 
-		"<ul><li>The <i><b>Status</b></i> area at the top of the page shows the current Squeezelite Player status and may be refreshed by pressing the <i>Refresh</i> button. Squeezelite can be <i>Enable</i>d, <i>Disable</i>d and <i>Restart</i>ed  using the respective buttons. The player will be reported as <i>active / running</i> if it is running correctly. If it fails to show this then check the configuration options and restart the player.</li>" ..
+		"<ul><li>The <i><b>Status</b></i> area at the top of the page shows the current Squeezelite pPlayer status and may be refreshed by pressing the <i>Refresh</i> button. The player will be reported as <i>active / running</i> if it is running correctly. If it fails to show this then check the configuration options and restart the player.</li>" ..
 		"<li>Configuration options are specified in the fields to the left.  Update each field and click <i>Save</i> to store them or <i>Save&nbsp;and&nbsp;Restart</i> to store them and then restart the player using the new options.</li>" ..
-		"<li><i><b>Name</b></i> allows you to specify the player name.  If you leave it blank, you can set the player name from within Squeezebox Server.</i>" ..
+		"<li><i><b>Name</b></i> allows you to specify the player name.  If you leave it blank, you can set it from within Squeezebox Server.</i>" ..
 		"<li><i><b>Audio Device</b></i> specifies which audio output device to use and should always be set.  You should normally prefer devices with names starting <i>hw:</i> to directly drive the hardware output device.  If multiple devices are listed, try each device in turn and restart the player each time to find the correct device for your DAC.</li>" ..
-		"<li><i><b>Alsa&nbsp;Params</b></i> specifies detailed Alsa configuration parameters and is not normally needed for your device to work.  Use it if the player status shows it is not running or to optimise audio playback if you experience drop outs. This field contains four parameters separated by ':' (colons), for example: '40:4:16:1'. Each field can be left out to use the default. They are:" ..
+		"<li><i><b>Alsa&nbsp;Params</b></i> allows you to set detailed linux audio output (Alsa) parameters and is not normally needed for your device to work.  Adjust these options if the player status shows it is not running or to optimise audio playback if you experience audio drop outs. There are four parameters:" ..
 		"<ul>" ..
-		"<li>Alsa <i>buffer time</i> in ms, or <i>buffer size</i> in bytes; (default 40), increase if you experience drop outs</li>" ..
-		"<li>Alsa <i>period count</i> or <i>period size</i> in bytes; (default 4)</li>" ..
-		"<li>Alsa <i>sample format</i> - one of 32, 24, 24_3 or 16; (default autodetect), try 16 if other values do not work</li>" ..
-		"<li>Alsa <i>MMAP</i> - one of 0 or 1; (default autodetect), try 0 if other values do not work</li>" ..
+		"<li>Alsa <i>buffer time</i> in ms, or <i>buffer size</i> in bytes; (default 40), set to a higher value if you experience drop outs.</li>" ..
+		"<li>Alsa <i>period count</i> or <i>period size</i> in bytes; (default 4).</li>" ..
+		"<li>Alsa <i>sample format</i> number of bits of data sent to Alsa for each sample - try 16 if other values do not work.</li>" ..
+		"<li>Alsa <i>MMAP</i> enables or disables Alsa MMAP mode which reduces cpu load, try disabling if the player fails to start.</li>" ..
 		"</ul>" ..
-		"<li>You may want to try '::16:0' or ':::0' if your device fails to start. Try '100:::' if you are experiencing drop outs.</li>" ..
-		"<li><i><b>Sample&nbsp;Rates</b></i> allows you to specify the sample rates supported by the device so that it does not need to be present when Squeezelite is started.  Ether specify a single <i>maximum</i> sample rate, specify the <i>minimum</i> and <i>maximum</i> rates separated by '-' (dash without spaces), or specify all supported rates separated by commas.</li>" ..
-		"<li><i><b>Resample</b></i> enables software resampling (upsampling) using the parameters specified. These are described in more detail <a href='/resample.html'>here</a>.</li>" ..
-		"<li>Select <i><b>Dop</b></i> to indicate that your DAC supports DSP over PCM (DoP) playback. You may also specify a delay in ms when switching between PCM and DoP modes.</i>" ..
-		"<li>Select <i><b>Visuliser</b></i> to enable support of the visuliser display within HDMI user interface.</li></ul>",
-		context_advanced = 
-		"<p><ul><li><i><b>Advanced</b></i> options shows additional options which you will normally not need to adjust. These include logging which is used to help debug problems.</li>" ..
-		"<li>Adjust <i><b>Log&nbsp;Level</b></i> to adjust the level of logging information written to the <i><b>Log&nbsp;File</b></i> and shown in the log window at the bottom of this page. Click in the log window to start and stop update of the log window. Common log level settings are:</li>" ..
-		"<ul><li>output=info</li><li>output=debug</li><li>decode=debug</li><li>all=debug</li></ul>" ..
+		"<li><i><b>Sample&nbsp;Rates</b></i> allows you to specify the sample rates supported by the device so that it does not need to be present when Squeezelite is started.  Ether specify a single <i>maximum</i> sample rate, or specify all supported rates separated by commas.  You may also specify a delay in ms to add when changing sample rates if you DAC requires this.</li>" ..
+		"<li><i><b>Dop</b></i> enables you to select that your DAC supports DSP over PCM (DoP) playback. You may also specify a delay in ms when switching between PCM and DoP modes.</li></ul>",
+		context_resample = 
+		"<p><ul><li><i><b>Resample</b></i> enables software resampling (upsampling) using the high quality SoX Resampler library.  By default audio is upsampled to the maximum synchronous sample rate supported by the output device.</li>" ..
+		"<li>Selecting <i><b>Asychronous</b></i> will always resample to the maximum output sample rate.  Selecting <i><b>By Exception</b></i> will only resample when the output device does not support the sample rate of the track being played.</li>" .. 
+		"<li><i><b>Soxr&nbsp;Recipe</b></i> specifies the base Soxr recipe to be used:" ..
+		"<ul><li><i>Quality</i> selects the quality of resampling. It is recommended that only <i>High</i> quality (the default) or <i>Very High</i> quality is used. Note that higher quality requires more cpu processing power and this increases with sample rate.</li>" ..
+		"<li><i>Filter</i> selects the filter phase response to use." ..
+		"<li><i>Steep</i> selects the whether to use a steep cutoff filter.</li></ul>"..
+		"<li><i><b>Soxr&nbsp;Options</b></i> specifies advanced options which provided fine grain adjustment:"..
+		"<ul><li><i>Flags</i> specifies Soxr option flags in hexadecimal (advanced users only).</li>"..
+		"<li><i>Attenuation</i> specifies attenuation in dB to apply to avoid audio clipping during resampling (defaults to 1dB).</li>"..
+		"<li><i>Passband End</i> specifies where the passband ends as percentage; 100 is the Nyquist frequency.</li>"..
+		"<li><i>Stopband Start</i> specifies where the stopband starts as percentage; 100 is the Nyquist frequency.</li>"..
+		"<li><i>Phase Response</i> specifies the filter phase between 0 and 100; 0 = Minimum phase recipe, 25 = Intermediate phase recipe and 50 = Linear phase recipe.</li>" ..
 		"</ul>",
+		context_advanced = 
+		"<p><ul><li><i><b>Advanced</b></i> shows additional options which you will normally not need to adjust. These include logging which is used to help debug problems.</li>" ..
+		"<li>Adjust <i><b>Log&nbsp;Level</b></i> for each of the four logging categories to adjust the level of logging information written to the logfile and shown in the log window at the bottom of this page. Click in the log window to start and stop update of the log window.</li></ul>",
 	},
 	['squeezeserver'] = {
 		title = "Squeeze Server Control",
@@ -237,11 +312,7 @@ return {
 		refresh = "Refresh",
 		enable  = "Enable",
 		disable = "Disable",
-		start   = "Start",
-		stop    = "Stop",
 		restart = "Restart",
-		enable_start = "Enable and Start",
-		disable_stop = "Disable and Stop",
 		reset   = "Reset",
 		save    = "Save",
 		save_restart = "Save and Restart",
