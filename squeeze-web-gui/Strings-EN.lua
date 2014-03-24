@@ -97,7 +97,7 @@ return {
 		alsa = "Alsa Params",
 		resample = "Resample",
 		dop = "DoP",
-		vis = "Visuliser", 
+		vis = "Visualiser", 
 		other = "Other Options",
 		server = "Server IP Address",
 		advanced = "Advanced",
@@ -123,7 +123,7 @@ return {
 
 		advanced_tip = "Show advanced options",
 		resample_tip = "Enable resampling",
-		vis_tip= "Enable Visuliser display in Jivelite",
+		vis_tip= "Enable Visualiser display in Jivelite",
 
 		resample_recipe = "Soxr Recipe",
 		resample_options = "Soxr Options",
