@@ -101,7 +101,6 @@ return {
 		other = "Other Options",
 		server = "Server IP Address",
 		advanced = "Advanced",
-		
 		bit_16 = "16 bit",
 		bit_24 = "24 bit",
 		bit_24_3 = "24_3 bit",
@@ -109,7 +108,6 @@ return {
 		mmap_off = "No MMAP",
 		mmap_on = "MMAP",
 		dop_supported = "Device supports DoP",
-
 		name_tip = "Player name (optional)",
 		device_tip = "Select output device",
 		alsa_buffer_tip = "Alsa buffer size in ms or bytes (optional)",
@@ -120,11 +118,9 @@ return {
 		rate_delay_tip = "Delay when switching between sample rates in ms (optional)",
 		dop_tip = "Enable DSD over PCM (DoP)",
 		dop_delay_tip = "Delay when switching between PCM and DoP in ms (optional)",
-
 		advanced_tip = "Show advanced options",
 		resample_tip = "Enable resampling",
 		vis_tip= "Enable Visualiser display in Jivelite",
-
 		resample_recipe = "Soxr Recipe",
 		resample_options = "Soxr Options",
 		very_high = "Very High",
@@ -136,7 +132,6 @@ return {
 		intermediate = "Intermediate Phase",
 		minimum = "Minimum Phase",
 		steep = "Steep Filter",
-
 		resample_options = "Soxr Options",
 		flags = "Flags",
 		attenuation = "Attenuation",
@@ -146,7 +141,6 @@ return {
 		phase = "Phase",
 		async = "Asynchronous",
 		exception = "By Exception",
-
 		resample_quality_tip = "Resampling Quality (higher quality uses more processing power)",
 		resample_filter_tip = "Resampling Filter type",
 		resample_steep_tip = "Use Steep filter",
@@ -158,11 +152,9 @@ return {
 		resample_phase_tip = "Phase response (0 = minimum, 50 = linear, 100 = maximum)",
 		resample_async_tip = "Resample asynchronously to maximum sample rate (otherwise resamples to max synchronous rate)",
 		resample_exception_tip = "Resample only when desired sample rate is not supported by ouput device",
-
 		info = "Info",
 		debug = "Debug",
 		trace = "Trace",
-
 		loglevel_slimproto_tip = "Slimproto control session logging level",
 		loglevel_stream_tip = "Streaming logging level",
 		loglevel_decode_tip = "Decode logging level",
@@ -175,7 +167,6 @@ return {
 		mac_tip = "Player mac address, format: ab:cd:ef:12:34:56 (optional)",
  		server_tip = "Server IP address (optional)",
 		other_tip = "Other optional configuration parameters",
-
 		error_alsa_buffer = "Error setting Alsa buffer",
 		error_alsa_period = "Error setting Alsa period",
 		error_rate = "Error setting sample rate",
@@ -193,7 +184,6 @@ return {
 		error_priority = "Error setting RT Thread Priority",
 		error_mac = "Error setting MAC Address",
 		error_server = "Error settting Server",
-
 		context = 
 		"<ul><li>The <i><b>Status</b></i> area at the top of the page shows the current Squeezelite pPlayer status and may be refreshed by pressing the <i>Refresh</i> button. The player will be reported as <i>active / running</i> if it is running correctly. If it fails to show this then check the configuration options and restart the player.</li>" ..
 		"<li>Configuration options are specified in the fields to the left.  Update each field and click <i>Save</i> to store them or <i>Save&nbsp;and&nbsp;Restart</i> to store them and then restart the player using the new options.</li>" ..
@@ -263,7 +253,7 @@ return {
 		options_tip = "Additional mount options",
 		context =
 		"<ul><li>Use this menu to attach (mount) local and remote disks to your device for use with the internal Squeezebox Server.</li>" ..
-		"<li>The <i><b>Mount&nbsp;Local&nbsp;Disk</b></i> section is used to attach local disks. Select one of the mountpoint options. This is the path where it will appear on the device file system. Select one of the disk options. You will not normally need to select the type of the disk as this is detected automatically from it's format.  Click <i>Add</i> to attach the disk to the device. If this is sucessful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown. If your disk has multiple partitions you may need to try each disk option in turn to find the correct one for your files.</li>" ..
+		"<li>The <i><b>Mount&nbsp;Local&nbsp;Disk</b></i> section is used to attach local disks. Select one of the mountpoint options. This is the path where it will appear on the device file system. Select one of the disk options. You will not normally need to select the type of the disk as this is detected automatically from its format.  Click <i>Add</i> to attach the disk to the device. If this is sucessful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown. If your disk has multiple partitions you may need to try each disk option in turn to find the correct one for your files.</li>" ..
 		"<li>The <i><b>Mount&nbsp;Network&nbsp;Share</b></i> section is used to attach network shares. Select one of the mountpoint options. Then add the network share location and select the type of network share.  For Windows (Cifs) shares you will also be asked for a username, password and domain. You may not need to include all of these details. Click <i>Add</i> to attach the disk to the device. If this is successful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown.</li>" ..
 		"<li>Mounted file systems will be re-attached when the device restarts if they are available.  To disconnect them click the <i>Remove</i> button alongside the mount entry in the <i>Mounted&nbsp;File&nbsp;Systems</i> area.</li></ul>",
 	},
@@ -301,7 +291,6 @@ return {
 		squeezeserver = "Squeeze Server",
 	},
 	['footer'] = {
-		title = "Notes",
 		copyright = "Copyright",
 		version = "Version",
 	},
