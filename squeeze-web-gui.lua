@@ -477,7 +477,7 @@ function NetworkHandler:_response(type, err)
 
 	t['p_iftype'] = type
 	t['p_is_wlan'] = is_wireless
-	t['p_onboot_checked'] = config.onboot == "true" and "checked" or ""
+	t['p_onboot_checked'] = config.onboot and "checked" or ""
 	t['p_dhcp_checked']   = config.bootproto == "dhcp" and "checked" or nil
 	t['p_ipv4'] = "(none)"
 

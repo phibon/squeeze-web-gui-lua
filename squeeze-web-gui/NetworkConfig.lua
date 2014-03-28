@@ -40,7 +40,7 @@ function params(wireless)
 end
 
 function get(int, is_wireless)
-	local config = { onboot = "true" }
+	local config = {}
 
 	local conf = io.open(configFilePrefix .. int, "r")
 	if conf then
@@ -51,6 +51,7 @@ function get(int, is_wireless)
 			end
 		end
 		config.dhcp = (config.bootproto == "dhcp")
+		config.onboot = (config.onboot ~= "no")
 		conf:close()
 	else
 		log.debug("unable to open: " .. configFilePrefix .. int)
@@ -163,7 +164,7 @@ function set(config, int, is_wireless)
 					end
 					static_found[string.lower(k)] = true
 				elseif k == 'ONBOOT' then
-					outconf:write("ONBOOT=" .. (config.onboot and "true" or "false") .. "\n")
+					outconf:write("ONBOOT=" .. (config.onboot and "yes" or "no") .. "\n")
 				elseif k == 'SCAN_SSID' then
 					-- ignored as added above
 				elseif k == "ESSID" then
