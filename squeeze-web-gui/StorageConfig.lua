@@ -21,29 +21,29 @@
 -- along with squeeze-web-gui-lua. If not, see <http://www.gnu.org/licenses/>.
 
 local io, string, os, lfs, ipairs, pairs, table, tonumber, tostring = io, string, os, lfs, ipairs, pairs, table, tonumber, tostring
-local util, log = util, log
+local util, cfg, log = util, cfg, log
 
 module(...)
 
 local fstabLocation = "/etc/fstab"
-local tmpFile       = "/tmp/conf.tmp"
-
 local local_disks   = "/dev/"
 
 function _mounts()
 	local mounts = {}
+	local storage = {}
+	for _, v in ipairs(cfg.storagedirs) do
+		storage[v] = true
+	end
 
 	local cap = util.capture('mount') .. "\n"
 	for line in string.gmatch(cap, "(.-)\n") do
-		if string.match(line, "/storage") or string.match(line, "/mnt/disk") then
-			local spec, mountp, type, opts = string.match(line, "(.-) on (.-) type (.-) %((.-)%)")
+		local spec, mountp, type, opts = string.match(line, "(.-) on (.-) type (.-) %((.-)%)")
+		if spec and mountp and storage[mountp] and type and opts then
 			-- mount returns fuseblk for ntfs-3g file systems, but does not understand it as a fstype
 			if type == 'fuseblk' then
 				type = 'ntfs-3g'
 			end
-			if spec and mountp and type and opts then
-				mounts[#mounts+1] = { spec = spec, mountp = mountp, type = type, opts = opts, perm = false, active = true } 
-			end
+			mounts[#mounts+1] = { spec = spec, mountp = mountp, type = type, opts = opts, perm = false, active = true } 
 		end
 	end
 	return mounts
@@ -90,14 +90,13 @@ end
 
 function mountpoints(mounts)
 	local mounts = mounts or _mounts()
-	local available_mounts = { "/storage", "/mnt/disk1", "/mnt/disk2", "/mnt/disk3", "/mnt/disk4", "/mnt/disk5" }
 	local exclude, t = {}, {}
 	
 	-- only show available mounts
 	for _, mount in ipairs(mounts) do
 		exclude[mount.mountp] = true
 	end
-	for _, v in ipairs(available_mounts) do
+	for _, v in ipairs(cfg.storagedirs) do
 	    if not exclude[v] then
 			t[#t+1] = v
 	    end
@@ -118,6 +117,7 @@ function localdisks()
 end
 
 function set(mounts)
+	local tmpFile = cfg.tmpdir .. "/config.tmp-luagui"
 	local fstab = io.open(fstabLocation, "r")
 	local tmp   = io.open(tmpFile, "w")
 
@@ -160,6 +160,8 @@ function set(mounts)
 end
 
 function cred_file(mountp, user, pass, domain)
+	local tmpFile = cfg.tmpdir .. "/config.tmp"
+
 	local credFile = 'cifs' .. string.gsub(mountp, "/", "-")
 	
 	local tmp = io.open(tmpFile, "w")

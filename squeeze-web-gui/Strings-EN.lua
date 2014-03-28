@@ -56,6 +56,7 @@ return {
 		int_down = "Interface Down",
 		int_up = "Interface Up",
 		int_downup = "Interface Down / Interface Up",
+		none = "(none)",
 		ipaddr_tip = "Enter static IP address",
 		netmask_tip = "Enter network mask",
 		gateway_tip = "Enter router address",

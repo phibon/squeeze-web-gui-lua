@@ -29,6 +29,7 @@ ffi.cdef[[int fileno(void *)]]
 -- globals accessed by required modules
 log   = turbo.log
 util  = {}
+cfg   = {}
 
 local NetworkConfig     = require('squeeze-web-gui.NetworkConfig')
 local SqueezeliteConfig = require('squeeze-web-gui.SqueezeliteConfig')
@@ -50,10 +51,6 @@ local PORT = 8081
 local path  = "."
 local templ_path  = path .. '/templ/'
 local static_path = path .. '/static/'
-
--- interface ids
-local eth_id  = "eth0"
-local wlan_id = "wlan0"
 
 -- languages supported
 local languages = { EN = true, DE = true, }
@@ -168,6 +165,40 @@ local footer_t = { release = release }
 
 ------------------------------------------------------------------------------------------
 
+-- read config
+local configFile = "/etc/sysconfig/squeeze-web-gui"
+
+function read_config()
+	local config = io.open(configFile, "r")
+	if config then
+		for line in config:lines() do
+			if string.match(line, "TEMP_DIR") then
+				cfg.tmpdir = string.match(line, '^TEMP_DIR=%s*(.-)%s*$')
+			end
+			if string.match(line, "WIRED_INTERFACE") then
+				cfg.wired = string.match(line, '^WIRED_INTERFACE=%s*(.-)%s*$')
+			end
+			if string.match(line, "WIRELESS_INTERFACE") then
+				cfg.wireless = string.match(line, '^WIRELESS_INTERFACE=%s*(.-)%s*$')
+			end
+			if string.match(line, "STORAGE_DIRS") then
+				local dirs = (string.match(line, '^STORAGE_DIRS=%s*(.-)%s*$') or "") .. ","
+				cfg.storagedirs = {}
+				for d in string.gmatch(dirs, "(.-),") do
+					cfg.storagedirs[#cfg.storagedirs + 1] = d
+				end
+			end
+		end
+		config:close()
+	end
+	-- ensure tmp loction set
+	cfg.tmpdir = cfg.tmpdir or "/tmp"
+end
+
+read_config()
+
+------------------------------------------------------------------------------------------
+
 -- strings
 local stringsPrefix = "squeeze-web-gui/Strings-"
 local prefsFile     = os.getenv("HOME") .. "/.squeeze-web-gui.lang"
@@ -250,7 +281,7 @@ local service_actions = {
 }
 
 function PageHandler:renderResult(template, t)
-	local header_t = { context = t['context'] }
+	local header_t = { context = t['context'], p_wired = cfg.wired, p_wireless = cfg.wireless }
 	setmetatable(header_t, { __index = strings['header'] })
 	self:write( templ:render('header.html', header_t ) )
 	self:write( templ:render(template, t) )
@@ -291,7 +322,7 @@ function IndexHandler:get()
 		language = lang
 	end
 
-	local t = { p_languages = {}, p_eth_id = eth_id, p_wlan_id = wlan_id }
+	local t = { p_languages = {} }
 
 	local l = t['p_languages']
 	for k, _ in pairs(languages) do
@@ -314,7 +345,6 @@ local info_files = {
 local localefile  = '/etc/locale.conf'
 local localesfile = '/usr/share/system-config-language/locale-list'
 local zonefiles   = '/usr/share/zoneinfo/'
-local tmpFile     = '/tmp/tmpfile.txt'
 
 function _zones(dir)
 	local attr = lfs.attributes(zonefiles .. (dir or ""))
@@ -416,6 +446,8 @@ function SystemHandler:get()
 end
 
 function SystemHandler:post()
+	local tmpFile     = cfg.tmpdir .. '/tmpfile.txt-luagui'
+
 	local hostname = self:get_argument("hostname", false)
 	if hostname then
 		log.debug("setting hostname to " .. hostname)
@@ -466,8 +498,8 @@ end
 
 -- network.html
 function NetworkHandler:_response(type, err)
-	local int = (type == "eth" and eth_id or wlan_id)
-	local is_wireless = (int == wlan_id)
+	local int = (type == "wired" and cfg.wired or cfg.wireless)
+	local is_wireless = (type ~= "wired")
 	local config = NetworkConfig.get(int, is_wireless)
 	local t = {}
 
@@ -479,7 +511,7 @@ function NetworkHandler:_response(type, err)
 	t['p_is_wlan'] = is_wireless
 	t['p_onboot_checked'] = config.onboot and "checked" or ""
 	t['p_dhcp_checked']   = config.bootproto == "dhcp" and "checked" or nil
-	t['p_ipv4'] = "(none)"
+	t['p_ipv4'] = strings['network']['none']
 
 	local status = util.capture("ifconfig " .. int)
 	for line in string.gmatch(status, "(.-)\n") do
@@ -526,8 +558,8 @@ function NetworkHandler:get(type)
 end
 
 function NetworkHandler:post(type)
-	local int = (type == "eth" and eth_id or wlan_id)
-	local is_wireless = (int == wlan_id)
+	local int = (type == "wired" and cfg.wired or cfg.wireless)
+	local is_wireless = (type ~= "wired")
 
 	if self:get_argument('network_config_save', false) then
 		local other_ssid = self:get_argument('other_ssid', false)

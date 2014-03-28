@@ -21,12 +21,11 @@
 -- along with squeeze-web-gui-lua. If not, see <http://www.gnu.org/licenses/>.
 
 local io, string, os, ipairs, pairs, tonumber, tostring = io, string, os, ipairs, pairs, tonumber, tostring
-local util, log = util, log
+local util, cfg, log = util, cfg, log
 
 module(...)
 
 local configFilePrefix = "/etc/sysconfig/network-scripts/ifcfg-"
-local configFileTmp    = "/tmp/ifcfg.config"
 
 function params(wireless)
 	local t = {
@@ -133,6 +132,8 @@ function validate(c)
 end
 
 function set(config, int, is_wireless)
+	local configFileTmp    = cfg.tmpdir .. "/ifcfg.config-luagui"
+
 	local inconf = io.open(configFilePrefix .. int, "r")
 	local outconf = io.open(configFileTmp, "w")
 

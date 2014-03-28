@@ -21,12 +21,11 @@
 -- along with squeeze-web-gui-lua. If not, see <http://www.gnu.org/licenses/>.
 
 local io, string, os, tonumber, tostring, ipairs = io, string, os, tonumber, tostring, ipairs
-local util, log = util, log
+local util, cfg, log = util, cfg, log
 
 module(...)
 
 local configFile    = "/etc/sysconfig/squeezelite"
-local configFileTmp = "/tmp/squeezelite.config"
 
 function params()
 	return {
@@ -177,6 +176,8 @@ function validate(c)
 end
 
 function set(c)
+	local configFileTmp = cfg.tmpdir .. "/squeezelite.config-luagui"
+
 	local outconf = io.open(configFileTmp, "w")
 
 	if outconf then

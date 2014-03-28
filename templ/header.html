@@ -55,12 +55,16 @@ function check_help() {
 	<span id="nav-system">
 		<a href="/system.html">{{{system}}}</a>
 	</span> 
+	{{#p_wired}}
 	<span id="nav-wired">
-		<a href="/network-eth.html">{{{ethernet}}}</a>
+		<a href="/network-wired.html">{{{ethernet}}}</a>
 	</span> 
+	{{/p_wired}}
+	{{#p_wireless}}
 	<span id="nav-wireless">
-		<a href="/network-wlan.html">{{{wireless}}}</a>
+		<a href="/network-wireless.html">{{{wireless}}}</a>
 	</span> 
+	{{/p_wireless}}
 	<span id="nav-squeezelite">
 		<a href="/squeezelite.html">{{{squeezelite}}}</a>
 	</span> 
