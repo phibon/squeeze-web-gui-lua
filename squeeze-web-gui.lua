@@ -42,7 +42,7 @@ local strings, language
 -- configuration
 
 -- release version id
-local release = "test"
+local release = "1.0"
 
 -- server port
 local PORT = 8081
@@ -540,13 +540,18 @@ function NetworkHandler:_response(type, err)
 			table.insert(t['p_essids'], { id = v.ssid, selected = (v.ssid == config.essid and "selected" or "") })
 			essids[v.ssid] = true
 		end
-
 		-- put previous selection on top of list if not already there
 		if not essids[config.essid] then
 			table.insert(t['p_essids'], 1, { id = config.essid, selected = "selected" })
 		end
 		-- add option to add private network
 		table.insert(t['p_essids'], { id = strings['network']['add_private'] })
+
+		t['p_regdomains'] = { { id = "", desc = "" } }
+		for _, v in ipairs(NetworkConfig.regions()) do
+			table.insert(t['p_regdomains'], { id = v, selected = (v == config.regdomain and "selected" or ""), 
+											  desc = strings['network'][v] or v})
+		end
 	end
 
 	setmetatable(t, { __index = strings['network'] })
@@ -760,7 +765,7 @@ function SqueezeserverHandler:_response()
 		end
 	end
 
-	t['p_server_url'] = 'http://' .. string.gsub(self.request['host'], tostring(PORT), 9000)
+	t['p_server_url'] = 'http://' .. (string.match(self.request['host'], "(.-):") or self.request['host']) .. ":9000"
 
 	setmetatable(t, { __index = strings['squeezeserver'] })
 	self:renderResult('squeezeserver.html', t)

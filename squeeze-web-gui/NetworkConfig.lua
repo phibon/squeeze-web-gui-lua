@@ -34,6 +34,7 @@ function params(wireless)
 	if wireless then
 		t[#t+1] = 'essid'
 		t[#t+1] = 'wpa_psk'
+		t[#t+1] = 'regdomain'
 	end
 	return t
 end
@@ -66,6 +67,14 @@ function get(int, is_wireless)
 					config[ string.lower(k) ] = string.match(v, "^'(.*)'$") or v
 				end
 			end
+		end
+
+		local domainfile = io.open("/etc/sysconfig/regdomain", "r")
+		if domainfile then
+			for line in domainfile:lines() do
+				config.regdomain = string.match(line, "COUNTRY=(%a%a)") or config.regdomain
+			end
+			domainfile:close()
 		end
 	end
 
@@ -132,7 +141,7 @@ function validate(c)
 end
 
 function set(config, int, is_wireless)
-	local configFileTmp    = cfg.tmpdir .. "/ifcfg.config-luagui"
+	local configFileTmp = cfg.tmpdir .. "/ifcfg.config-luagui"
 
 	local inconf = io.open(configFilePrefix .. int, "r")
 	local outconf = io.open(configFileTmp, "w")
@@ -215,5 +224,26 @@ function set(config, int, is_wireless)
 		else
 			log.error("unable to write: " .. configFileTmp)
 		end
+
+		local regdomain = io.open(configFileTmp, "w")
+		if regdomain then
+			regdomain:write("# created by squeeze-web-gui-lua " .. os.date() .. "\n")
+			if config.regdomain then
+				regdomain:write("COUNTRY=" .. (config.regdomain or "") .. "\n")
+			end
+			regdomain:close()
+
+			util.execute("sudo sp-wirelessRegDomainUpdate " .. configFileTmp)
+			util.execute("rm " .. configFileTmp)
+
+			log.debug("wrote and updated regdomain file")
+		else
+			log.error("unable to write: " .. configFileTmp)
+		end
 	end
+end
+
+function regions()
+	return { 'AT', 'AU', 'BE', 'CA', 'CH', 'CN', 'DE', 'DK', 'ES', 'FI', 'FR', 'GB', 'HK', 'HU', 'JP', 'IE', 'IL', 'IN', 'IT', 'NL',
+			 'NO', 'NZ', 'PL', 'PT', 'RS', 'RU', 'SE', 'US', 'ZA' }
 end
