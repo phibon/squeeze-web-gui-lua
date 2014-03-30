@@ -72,7 +72,7 @@ function get(int, is_wireless)
 		local domainfile = io.open("/etc/sysconfig/regdomain", "r")
 		if domainfile then
 			for line in domainfile:lines() do
-				config.regdomain = string.match(line, "COUNTRY=(%a%a)") or config.regdomain
+				config.regdomain = string.match(line, "COUNTRY=(%a%a)") or string.match(line, "COUNTRY=(%d%d)") or config.regdomain
 			end
 			domainfile:close()
 		end
@@ -244,6 +244,6 @@ function set(config, int, is_wireless)
 end
 
 function regions()
-	return { 'AT', 'AU', 'BE', 'CA', 'CH', 'CN', 'DE', 'DK', 'ES', 'FI', 'FR', 'GB', 'HK', 'HU', 'JP', 'IE', 'IL', 'IN', 'IT', 'NL',
-			 'NO', 'NZ', 'PL', 'PT', 'RS', 'RU', 'SE', 'US', 'ZA' }
+	return { '00', 'AT', 'AU', 'BE', 'CA', 'CH', 'CN', 'DE', 'DK', 'ES', 'FI', 'FR', 'GB', 'HK', 'HU', 'JP', 'IE', 'IL', 'IN', 'IT',
+			 'NL', 'NO', 'NZ', 'PL', 'PT', 'RS', 'RU', 'SE', 'US', 'ZA' }
 end

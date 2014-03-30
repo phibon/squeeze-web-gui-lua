@@ -113,6 +113,7 @@ return {
 		SE = "Sweden",
 		US = "USA",
 		ZA = "South Africa",
+		['00'] = "Roaming",
 	},
 	['squeezelite'] = {
 		title = "Squeezelite Player Configuration and Control",
