@@ -867,22 +867,25 @@ function StorageHandler:post()
 			end
 		end
 		
-		err = util.capture("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (opts and ("-o " .. opts .. " ") or "") ..
-						   spec .. " " .. mountp)
+		if spec and mountp then
+
+			err = util.capture("sudo mount " .. (type and ("-t " .. type .. " ") or "") .. (opts and ("-o " .. opts .. " ") or "") ..
+							   spec .. " " .. mountp)
 		
-		-- if mount worked then persist, storing opts passed not those parsed from active mounts
-		if not err or err == "" then
-			local mounts = StorageConfig.get()
-			for _, v in ipairs(mounts) do
-				if spec == v.spec and mountp == v.mountp then
-					v.opts = opts
-					v.perm = true
-					break
+			-- if mount worked then persist, storing opts passed not those parsed from active mounts
+			if not err or err == "" then
+				local mounts = StorageConfig.get()
+				for _, v in ipairs(mounts) do
+					if spec == v.spec and mountp == v.mountp then
+						v.opts = opts
+						v.perm = true
+						break
+					end
 				end
+				StorageConfig.set(mounts)
 			end
-			StorageConfig.set(mounts)
+
 		end
-		
 	end
 	
 	if unmount or remove_act then
