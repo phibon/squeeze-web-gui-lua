@@ -30,7 +30,7 @@ return {
 		"<ul><li>Via deze pagina kan je de instellingen van het Linux besturingsysteem aanpassen van uw apparaat.</li>" ..
 		"<li><i><b>Hostnaam</b></i> is de naam van uw apparaat. Deze kan verschillen van de naam van de speler instantie die op dit apparaat actief is. Deze naam wordt getoont in de lijst van namen van machines in uw netwerk als andere apparaten deze tonen.</li>" ..
 		"<li><i><b>Locatie</b></i> instellingen defini&euml;ren de tijdzone en taal van het apparaat volgens uw locatie.</li>" ..
-		"<li><i><b>Samba</b></i> instellingen specificeren de instellingen van de bestandsdeling van de Windows Server in dit apparaat. Dit wordt gebruikt zodat u toegang heeft tot de schijven van andere machines op het netwerk. Schijven worden gemonteerd via het Opslag menu.</li></ul>",
+		"<li><i><b>Samba</b></i> instellingen specificeren de instellingen van de bestandsdeling van de Windows Server in dit apparaat. Dit wordt gebruikt zodat u toegang heeft tot de schijven van andere machines op het netwerk. Schijven worden gekoppeld via het Opslag menu.</li></ul>",
 	},
 	['network'] = {
 		title_eth  = "Ethernet Interface Configuratie",
@@ -81,7 +81,7 @@ return {
 		error_static = "Fout instelling vast adres - IP adres, netwerkmasker en gateway zijn verplicht",
 		context =
 		"<ul><li>De huidige status van de interface vind je bovenaan deze pagina. Als er geen IP adres getoont wordt dan werkt de interface niet correct.</li>" ..
-		"<li><i><b>Bij Opstart</b></i> bepaalt of de interface wordt geactiveerd wanneer het apparaat wordt gestart. Zorg ervoor dat deze instelling bij ten minste één interface gezet is.</li>" ..
+		"<li><i><b>Bij Opstart</b></i> bepaalt of de interface wordt geactiveerd wanneer het apparaat wordt gestart. Zorg ervoor dat deze instelling bij ten minste &euml;&euml;n interface gezet is.</li>" ..
 		"<li><i><b>Gebruik DHCP</b></i> zorgt ervoor dat een IP adres wordt toegekend door uw netwerk. Schakel dit uit als u liever een vast IP adres gebruikt.</li>" ..
 		"<li>Klik <i><b>Opslaan</b></i> om de gewijzigde configuratie op te slaan. Klik daarna <i>Interface Uit / Interface Aan</i> om te interface te herstarten met de nieuwe instellingen.</li></ul>",
 		context_wifi = "<ul><li>U kunt een draadloos netwerk selecteren uit de lijst van gevonden <i>netwerknamen</i> of voer je eigen netwerknaam als deze niet in de lijst staat. Je moet hierbij ook een WPA wachtwoord invoeren. Merk op dat WPA / WPA2 met pre-shared key de enige ondersteunde authenticatie optie is.</li></ul>",
@@ -336,7 +336,7 @@ return {
 		enable  = "Inschakelen",
 		disable = "Uitschakelen",
 		restart = "Herstarten",
-		reset   = "Reset",
+		reset   = "Wissen",
 		save    = "Opslaan",
 		save_restart = "Opslaan en Herstarten",
 		configuration = "Configuratie",
