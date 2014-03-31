@@ -261,8 +261,8 @@ return {
 	['storage'] = {
 		title = "Storage",
 		mounts = "File Systems",
-		localfs = "Mount Local Disk",
-		remotefs = "Mount Network Share",
+		localfs = "Local Disk",
+		remotefs = "Network Share",
 		disk = "Disk",
 		network = "Network Share",
 		user = "User",
@@ -287,8 +287,8 @@ return {
 		options_tip = "Additional mount options",
 		context =
 		"<ul><li>Use this menu to attach (mount) local and remote disks to your device for use with the internal Squeezebox Server.</li>" ..
-		"<li>The <i><b>Mount&nbsp;Local&nbsp;Disk</b></i> section is used to attach local disks. Select one of the mountpoint options. This is the path where it will appear on the device file system. Select one of the disk options. You will not normally need to select the type of the disk as this is detected automatically from its format.  Click <i>Add</i> to attach the disk to the device. If this is sucessful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown. If your disk has multiple partitions you may need to try each disk option in turn to find the correct one for your files.</li>" ..
-		"<li>The <i><b>Mount&nbsp;Network&nbsp;Share</b></i> section is used to attach network shares. Select one of the mountpoint options. Then add the network share location and select the type of network share.  For Windows (Cifs) shares you will also be asked for a username, password and domain. You may not need to include all of these details. Click <i>Add</i> to attach the disk to the device. If this is successful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown.</li>" ..
+		"<li>The <i><b>Local&nbsp;Disk</b></i> section is used to attach local disks. Select one of the mountpoint options. This is the path where it will appear on the device file system. Select one of the disk options. You will not normally need to select the type of the disk as this is detected automatically from its format.  Click <i>Add</i> to attach the disk to the device. If this is sucessful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown. If your disk has multiple partitions you may need to try each disk option in turn to find the correct one for your files.</li>" ..
+		"<li>The <i><b>Network&nbsp;Share</b></i> section is used to attach network shares. Select one of the mountpoint options. Then add the network share location and select the type of network share.  For Windows (Cifs) shares you will also be asked for a username, password and domain. You may not need to include all of these details. Click <i>Add</i> to attach the disk to the device. If this is successful then an entry will appear in the <i>Mounted&nbsp;File&nbsp;Systems</i> area at the top of the page otherwise an error will be shown.</li>" ..
 		"<li>Mounted file systems will be re-attached when the device restarts if they are available.  To disconnect them click the <i>Remove</i> button alongside the mount entry in the <i>Mounted&nbsp;File&nbsp;Systems</i> area.</li></ul>",
 	},
 	['shutdown'] = {

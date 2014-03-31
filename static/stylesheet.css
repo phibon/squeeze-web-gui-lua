@@ -229,7 +229,7 @@ fieldset {
 legend {
   font-weight: bold;
   text-align: center;
-  width: 120px;
+  min-width: 120px;
   background-color: #eeeeee;
   color: #666;
   border-radius: 5px;

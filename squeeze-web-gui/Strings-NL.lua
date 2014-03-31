@@ -18,7 +18,7 @@ return {
 		samba = "Samba",
 		nb_name = "Samba Naam",
 		nb_group = "Samba Werkgroep",
-		hostname_tip = "Hostnaam van uw toestel",
+		hostname_tip = "Hostnaam van uw apparaat",
 		timezone_tip = "Selecteer de gewenste tijdzone",
 		locale_tip = "Selecteer de taalregio van uw locatie",
 		nb_name_tip = "Samba Netbios naam voor het delen van bestanden",
@@ -27,8 +27,8 @@ return {
 		os_version = "OS Versie",
 		fedora_version = "Fedora Versie",
 		context =
-		"<ul><li>Via deze pagina kan u de instellingen aanpassen van het Linux besturingsysteem van uw apparaat.</li>" ..
-		"<li><i><b>Hostname</b></i> is de naam van uw apparaat. Deze kan verschillen van de naam van de speler instantie die op dit apparaat actief is. Deze naam wordt getoont in de lijst van namen van machines in uw netwerk als andere apparaten deze tonen.</li>" ..
+		"<ul><li>Via deze pagina kan je de instellingen van het Linux besturingsysteem aanpassen van uw apparaat.</li>" ..
+		"<li><i><b>Hostnaam</b></i> is de naam van uw apparaat. Deze kan verschillen van de naam van de speler instantie die op dit apparaat actief is. Deze naam wordt getoont in de lijst van namen van machines in uw netwerk als andere apparaten deze tonen.</li>" ..
 		"<li><i><b>Locatie</b></i> instellingen defini&euml;ren de tijdzone en taal van het apparaat volgens uw locatie.</li>" ..
 		"<li><i><b>Samba</b></i> instellingen specificeren de instellingen van de bestandsdeling van de Windows Server in dit apparaat. Dit wordt gebruikt zodat u toegang heeft tot de schijven van andere machines op het netwerk. Schijven worden gemonteerd via het Opslag menu.</li></ul>",
 	},
@@ -54,21 +54,24 @@ return {
 		domain = "Domein",
 		essid  = "Netwerknaam",
 		wpa_psk = "WPA Wachtwoord",
+		regdomain = "Locatie",
 		int_down = "Interface Uit",
 		int_up = "Interface Aan",
 		int_downup = "Interface Uit / Interface Aan",
-		ipaddr_tip = "Voer vast IP adres in",
+		none = "(geen)",
+		ipaddr_tip = "Voer een vast IP adres in",
 		netmask_tip = "Voer Netwerkmasker in",
-		gateway_tip = "Voer router adres in",
+		gateway_tip = "Voer router / gateway adres in",
 		dns1_tip = "Voer 1st DNS server adres in",
 		dns2_tip = "Voer 2de DNS server adres in (optioneel)",
 		dns3_tip = "Voer 3de DNS server adres in (optioneel)",
 		domain_tip = "Voer DNS domein in (optioneel)",
 		essid_tip = "Selecteer Netwerk naam (SSID)",
-		other_ssid_tip = "Voer SSID in indien niet gevonden",
+		other_ssid_tip = "Voer SSID in indien deze niet in de lijst staat",
 		wpa_psk_tip = "Voer WPA wachtwoord in",
+		regdomain_tip = "Voer locatie in voor draadloze regio",
 		on_boot_tip = "Gebruik deze interface bij het opstarten",
-		dhcp_tip = "Gebruik DHCP om een IP adres te bekomen",
+		dhcp_tip = "Gebruik DHCP om een IP adres te krijgen",
 		error_ipaddr0 = "Fout instelling IP adres",
 		error_gateway0 = "Fout instelling gateway adres",
 		error_netmask0 = "Fout instelling netwerkmasker",
@@ -77,21 +80,51 @@ return {
 		error_dns3 = "Fout instelling DNS3",
 		error_static = "Fout instelling vast adres - IP adres, netwerkmasker en gateway zijn verplicht",
 		context =
-		"<ul><li>De huidige status van de interface vindt u bovenaan deze pagina. Als er geen IP adres getoont wordt dan werkt de interface niet correct.</li>" ..
-		"<li><i><b>Bij Opstart</b></i> bepaalt of de interface wordt geactiveerd wanneer het apparaat wordt gestart. Zorg ervoor dat deze instelling bij ten minste een interface gezet is.</li>" ..
-		"<li><i><b>DHCP</b></i> zorgt ervoor dat een IP adres wordt toegekend door uw netwerk. Schakel dit uit als u liever een vast IP adres gebruikt.</li>" ..
-		"<li><i>Opslaan</i> van configuratie wijzigingen en selecteer <i>Interface Uit / Interface Aan</i> om te interface te herstarten met de nieuwe instellingen.</li></ul>",
-		context_wifi = "<ul><li>U kunt een draadloos netwerk selecteren uit de lijst van gevonden <i>netwerknamen</i> of voer je eigen netwerknaam in indien deze verborgen is. U moet ook een WPA wachtwoord invoeren. Merk op dat WPA/WPA2 met een pre-shared key de enige ondersteunde authenticatie optie is.</li></ul>",
+		"<ul><li>De huidige status van de interface vind je bovenaan deze pagina. Als er geen IP adres getoont wordt dan werkt de interface niet correct.</li>" ..
+		"<li><i><b>Bij Opstart</b></i> bepaalt of de interface wordt geactiveerd wanneer het apparaat wordt gestart. Zorg ervoor dat deze instelling bij ten minste één interface gezet is.</li>" ..
+		"<li><i><b>Gebruik DHCP</b></i> zorgt ervoor dat een IP adres wordt toegekend door uw netwerk. Schakel dit uit als u liever een vast IP adres gebruikt.</li>" ..
+		"<li>Klik <i><b>Opslaan</b></i> om de gewijzigde configuratie op te slaan. Klik daarna <i>Interface Uit / Interface Aan</i> om te interface te herstarten met de nieuwe instellingen.</li></ul>",
+		context_wifi = "<ul><li>U kunt een draadloos netwerk selecteren uit de lijst van gevonden <i>netwerknamen</i> of voer je eigen netwerknaam als deze niet in de lijst staat. Je moet hierbij ook een WPA wachtwoord invoeren. Merk op dat WPA / WPA2 met pre-shared key de enige ondersteunde authenticatie optie is.</li></ul>",
+		AT = "Oostenrijk",
+		AU = "Australi&euml;",
+		BE = "Belgi&euml;",
+		CA = "Canada",
+		CH = " Zwitserland",
+		CN = "China",
+		DE = "Duitsland",
+		DK = " Denemarken",
+		ES = "Spanje",
+		FI = "Finland",
+		FR = "Frankrijk",
+		GB = " Groot-Brittanni&euml;",
+		HK = "Hong Kong",
+		HU = "Hongarije",
+		JP = "Japan",
+		IE = "Ierland",
+		IL = "Isra&euml;l",
+		IN = "Indi&euml;",
+		IT = "Itali&euml;",
+		NL = "Nederland",
+		NO = "Noorwegen",
+		NZ = "Nieuw-Zeeland",
+		PL = "Polen",
+		PT = "Portugal",
+		RS = "Servi&euml;",
+		RU = "Rusland",
+		SE = "Zweden",
+		US = "Verenigde Staten",
+		ZA = "Zuid-Africa",
+		['00'] = "Roaming",
 	},
 	['squeezelite'] = {
 		title = "Squeezelite Speler Configuratie en Controle",
 		name = "Naam",
 		audio_output = "Audio uitgang",
 		mac  = "MAC Adres",
-		device = "Audio Apparaat",
+		device = "Audioapparaat",
 		rate = "Samplefrequentie",
-		logfile = "Log Bestand",
-		loglevel = "Log Niveau",
+		logfile = "Logbestand",
+		loglevel = "Logniveau",
 		priority = "RT Thread Prioriteit",
 		buffer = "Buffer",
 		codec = "Codecs",
@@ -109,18 +142,18 @@ return {
 		mmap_off = "Geen MMAP",
 		mmap_on = "MMAP",
 		dop_supported = "Apparaat ondersteund DoP",
-		name_tip = "Naam van speler (optioneel)",
-		device_tip = "Selecteer uitvoerapparaat",
+		name_tip = "Naam van de speler (optioneel)",
+		device_tip = "Selecteer een uitvoerapparaat",
 		alsa_buffer_tip = "Alsa buffergrootte in ms of bytes (optioneel)",
 		alsa_period_tip = "Alsa periode graaf of grootte in bytes (optioneel)",
 		alsa_format_tip = "Alsa sample-formaat (optioneel)",
 		alsa_mmap_tip = "Alsa MMAP ondersteuning (optioneel)",
-		rate_tip = " Max ondersteunde samplefrequentie of door komma's gescheiden lijst van samplefrequentie (optioneel)",
-		rate_delay_tip = "Vertraging schakelen tussen samplefrequenties in ms (optioneel)",
+		rate_tip = " Max ondersteunde samplefrequentie of door komma's gescheiden lijst van samplefrequenties (optioneel)",
+		rate_delay_tip = "Vertraging voor het schakelen tussen samplefrequenties in ms (optioneel)",
 		dop_tip = "DSD via PCM inschakelen (DoP)",
-		dop_delay_tip = "Vetraging schakelen tussen PCM en DoP in ms (optioneel)",
+		dop_delay_tip = "Vetraging voor het schakelen tussen PCM en DoP in ms (optioneel)",
 		advanced_tip = "Toon geavanceerde opties",
-		resample_tip = "Inschakelen resampling",
+		resample_tip = "Inschakelen hersamplen",
 		vis_tip= " Visualizer weergave inschakelen in Jivelite",
 		resample_recipe = "Soxr Recept",
 		resample_options = "Soxr Opties",
@@ -156,17 +189,17 @@ return {
 		info = "Info",
 		debug = "Debug",
 		trace = "Traceren",
-		loglevel_slimproto_tip = "Slimproto controle sessie logboekregistratieniveau",
-		loglevel_stream_tip = "Streaming logboekregistratieniveau",
-		loglevel_decode_tip = "Decoderen logboekregistratieniveau",
-		loglevel_output_tip = "Niveau van de logboekregistratie voor uitvoer",
-		logfile_tip = "Debug uitvoer naar opgegeven bestand schrijven",
+		loglevel_slimproto_tip = "Slimproto controle sessie logboekregistratie niveau",
+		loglevel_stream_tip = "Streaming logboekregistratie niveau",
+		loglevel_decode_tip = "Decoderen logboekregistratie niveau",
+		loglevel_output_tip = "Uitvoer logboekregistratie niveau",
+		logfile_tip = "Logboek uitvoer naar opgegeven bestand schrijven",
 		buffer_stream_tip = "Stream buffergrootte in Kbytes (optioneel)",
 		buffer_output_tip = "Uitvoer buffergrootte in Kbytes (optioneel)",
 		codec_tip = "Door komma's gescheiden lijst met codecs te laden (optioneel - alle codecs worden geladen indien blanco)",
 		priority_tip = "RT thread prioriteit (1-99) (optioneel)",
 		mac_tip = "Mac adres van speler, formaat: ab:cd:ef:12:34:56 (optioneel)",
- 		server_tip = "IP adres Server (optioneel)",
+ 		server_tip = "IP adres Squeezebox Server (optioneel)",
 		other_tip = "Andere optionele configuratie parameters",
 		error_alsa_buffer = "Fout instelling Alsa buffer",
 		error_alsa_period = "Fout instelling Alsa periode",
@@ -186,19 +219,19 @@ return {
 		error_mac = "Fout instelling MAC Adres",
 		error_server = "Fout instelling Server",
 		context = 
-		"<ul><li>Het <i><b>Status</b></i> gebied bovenaan deze pagina toont de huidige status van de Squeezelite speler en kan vernieuwd worden door op de knop <i>Vernieuwen</i> te drukken. De speler heeft de status <i>actief / wordt uitgevoerd</i> wanneer deze correct wordt uitgevoerd. Controleer de instellingen en herstart de speler indien dit niet het geval is.</li>" ..
-		"<li>Configuratie-opties zijn opgegeven in de velden aan de linkerkant. Stel elk veld in en druk op <i>Opslaan</i> om de instellinegn op te slaan of druk op <i>Opslaan en herstart</i> om ze op te slaan en de speler te herstarten met de nieuwe instellingen.</li>" ..
-		"<li>Mbv de optie<i><b>Naam</b></i> kan je de speler een naam geven. Indien je dit veld leeg laat dan kan je de naam via LMS instellen.</i>" ..
-		"<li><i><b>Audio Apparaat</b></i> bepaalt welke audio uitgang van het apparaat er gebruikt wordt en moet altijd ingesteld zijn. Gebruik steeds apparaten met namen die met <i>hw:</i> beginnen. Als er meerdere apparaten in de lijst staan probeer dan elk apparaat en herstart de speler telkens tot je het juiste apparaat voor jouw DAC gevonden hebt</li>" ..
-		"<li><i>Mbv <b>Alsa&nbsp;Parameters</b></i>  kan je geavanceerde audio instellingen wijzigen van het Linux systeem (Alsa). In princiepe hoef je deze niet aan te passen. Wijzig deze parameters indien de status aangeeft dat uw audio apparaat niet werkt of om de audioweergave te optimaliseren indien de weergave onderbroken wordt. Er zijn vier parameters:" ..
+		"<ul><li>Het <i><b>Status</b></i> venster bovenaan deze pagina toont de huidige status van de Squeezelite speler en kan vernieuwd worden door op de knop <i>Vernieuwen</i> te drukken. De speler heeft de status <i>actief / wordt uitgevoerd</i> wanneer deze correct wordt werkt. Controleer de instellingen en herstart de speler indien dit niet het geval is.</li>" ..
+		"<li>Configuratie Opties zijn opgegeven in de velden aan de linkerkant. Stel elk veld in en druk op <i>Opslaan</i> om de instellinegn op te slaan of druk op <i>Opslaan en herstart</i> om ze op te slaan en de speler te herstarten met de nieuwe instellingen.</li>" ..
+		"<li>In het veld <i><b>Naam</b></i> kan je een naam opgeven voor de speler. Indien je dit veld leeg laat dan kan je de naam via LMS instellen.</i>" ..
+		"<li><i><b>Audioapparaat</b></i> bepaalt welke audio uitgang van het apparaat er gebruikt wordt en moet altijd ingesteld zijn. Gebruik steeds apparaten met namen die met <i>hw:</i> beginnen. Als er meerdere apparaten in de lijst staan probeer dan elk apparaat en herstart de speler telkens tot je het juiste apparaat voor jouw DAC gevonden hebt.</li>" ..
+		"<li><i>Mbv <b>Alsa&nbsp;Parameters</b></i>  kan je de geavanceerde audio instellingen wijzigen van het Linux systeem (Alsa). In princiepe hoef je deze niet aan te passen. Wijzig deze parameters indien de status aangeeft dat uw audioapparaat niet werkt of om de audioweergave te optimaliseren indien de weergave onderbroken wordt. Er zijn vier parameters:" ..
 		"<ul>" ..
 		"<li>Alsa <i>buffertijd</i> in ms, of <i>buffergrootte</i> in bytes; (standaard 40), verhoog deze waarde indien de weergave steeds onderbroken wordt.</li>" ..
-		"<li>Alsa <i>period graaf</i> of <i>grootte</i> in bytes; (standaard 4).</li>" ..
-		"<li>Alsa <i>sample-formaat</i> aantal bits van data die naar Alsa gestuurd worden voor elke sample - probeer 16 als andere waarden niet werken.</li>" ..
-		"<li>Alsa <i>MMAP</i> in- of uitschakelen van Alsa MMAP mode welke de cpu belasting verleint. Probeer deze uit te schakelen als de speler niet start.</li>" ..
+		"<li>Alsa <i>periode graaf</i> of <i>grootte</i> in bytes; (standaard 4).</li>" ..
+		"<li>Alsa <i>sample-formaat</i> is het aantal bits in de datastroom die naar Alsa gestuurd worden voor elke sample - probeer 16 als andere waarden niet werken.</li>" ..
+		"<li>Alsa <i>MMAP:</i> in- of uitschakelen van Alsa MMAP mode die de cpu belasting verkleint. Probeer deze uit te schakelen als de speler niet start.</li>" ..
 		"</ul>" ..
-		"<li>Mbv <i><b>Samplefrequentie</b></i> is het mogelijk om de samplefrequentie(s) in te stellen die ondersteund worden door uw audioapparaat zodat deze niet aanwezig hoeft te zijn wanneer Squeezelite start. Ofwel geef je een <i>maximum</i> samplefrequentie, ofwel geef je een lijst van alle ondersteunde samplefrequenties gescheiden door comma's. Het is ook mogelijk om een vertraging op te geven in ms voor het schakelen tussen samplefrequenties als uw DAC dit vereist.</li>" ..
-		"<li>Mbv <i><b>DoP</b></i> kan je aangeven dat uw DAC ondersteuning biedt voor DSP over PCM (DoP) weergave. Je kan ook een vertraging (in ms) opgeven om te schakelen tussen PCM en DoP modes.</li></ul>",
+		"<li>Mbv <i><b>Samplefrequentie</b></i> is het mogelijk om de samplefrequentie(s) in te stellen die ondersteund worden door uw audioapparaat zodat deze niet aanwezig hoeft te zijn wanneer Squeezelite start. Ofwel geef je een <i>maximum</i> samplefrequentie, ofwel geef je een lijst van alle ondersteunde samplefrequenties gescheiden door komma's. Het is ook mogelijk om een vertraging in te stellen (in ms) tijdens het schakelen tussen samplefrequenties als uw DAC dit vereist.</li>" ..
+		"<li>Mbv <i><b>DoP</b></i> kan je aangeven dat uw DAC ondersteuning biedt voor DSP over PCM (DoP) weergave. Je kan ook een vertraging (in ms) instellen tijdens het schakelen tussen PCM en DoP modes.</li></ul>",
 		context_resample = 
 		"<p><ul><li><i><b>Hersamplen</b></i> schakelt software hersamplen in (upsampling) en gebruikt een kwalitatief hoogwaardige SoX bibliotheek. Standaard wordt audio geupsampled naar de maximale ondersteunde synchrone samplefrequentie van het uitvoerapparaat.</li>" ..
 		"<li><i><b>Asynchroon</b></i> zal steeds hersamplen naar de hoogst mogelijke samplefrequentie. <i><b>Bij Uitzondering</b></i> gaat alleen hersamplen indien de samplefrequentie van het bestand niet ondersteund wordt door het uitvoerapparaat.</li>" .. 
@@ -214,22 +247,22 @@ return {
 		"<li><i>Fase Respons</i>  selecteert de fase van het filter tussen 0 en 100; 0 = Minimum fase, 25 = Intermediaire fase en 50 = Lineaire fase.</li>" ..
 		"</ul>",
 		context_advanced = 
-		"<p><ul><li><i><b>Geavanceerd</b></i> toont bijkomende opties die je in normale omstandigheden niet hoeft te wijzigen. Deze omvatten oa logboeken om te helpen bij het verhelpen van problemen.</li>" ..
+		"<p><ul><li><i><b>Geavanceerd</b></i> toont bijkomende opties die je in normale omstandigheden niet hoeft te wijzigen. Deze omvatten oa logboeken die waardevolle informatie kunnen bevatten bij het verhelpen van problemen.</li>" ..
 		"<li><i><b>Logniveau</b></i> aanpassen voor elk van de vier logboeken en loginformatie die getoont wordt in het logvenster onderaan deze pagina. Klik in het logvenster om het opfrissen te starten en te stoppen.</li></ul>",
 	},
 	['squeezeserver'] = {
-		title = "Squeeze Server Controle",
-		web_interface = "SqueezeServer Web Interface",
+		title = "Squeezebox Server Details",
+		web_interface = "Squeezebox Server Configuratie",
 		context =
-		"<ul><li>Het <i><b>Status</b></i> venster bovenaan deze pagina toont de huidige status van de lokale Squeezebox Server. De informatie in het venster kan vernieuwd worden door op <i>Vernieuwen</i> te drukken. De server kan je <i>Inschakelen</i>d, <i>Uitschekelen</i>d en <i>Herstarten</i> door op de respectievelijke knoppen te drukken. Als de server correct functioneert dan is de status <i>actief / in uitvoering</i></li>" ..
+		"<ul><li>Het <i><b>Status</b></i> venster bovenaan deze pagina toont de huidige status van de lokale Squeezebox Server. De informatie in het venster kan vernieuwd worden door op <i>Vernieuwen</i> te drukken. De server kan je <i>Inschakelen</i>, <i>Uitschekelen</i> en <i>Herstarten</i> door op de respectievelijke knoppen te drukken. Als de server correct functioneert dan is de status <i>actief / in uitvoering</i></li>" ..
 		"<li>Als er reeds een Squeezebox Server draait op een andere machine in je netwerk dan hoef je de lokale Squeezebox Server niet te activeren.</li>" ..
-		"<li>Mbv de <i>SqueezeServer&nbsp;Web&nbsp;Interface</i> knop kan je een web browser sessie openen naar de lokale Squeezebox Server als deze actief is.</li></ul>",
+		"<li>Mbv de <i>Squeezebox Server Configuratie</i> knop kan je een web browser sessie openen naar de lokale Squeezebox Server als deze actief is.</li></ul>",
 	},
 	['storage'] = {
 		title = "Opslag",
-		mounts = "Bestandssysteem",
-		localfs = "Koppel lokale schijf",
-		remotefs = "Koppel netwerkschijf",
+		mounts = "Gekoppelde Bestandssystemen",
+		localfs = "Koppel Lokale Schijf",
+		remotefs = "Koppel Netwerkschijf",
 		disk = "Schijf",
 		network = "Netwerkschijf",
 		user = "Gebruiker",
@@ -254,15 +287,15 @@ return {
 		options_tip = "Extra koppelopties",
 		context =
 		"<ul><li>Gebruik dit menu om lokale en externe schijven te koppelen met dit apparaat zodat ze toegankelijk zijn voor de lokale Squeezebox Server.</li>" ..
-		"<li>Via het <i><b>Koppel Lokale Schijf</b></i> sectie is het mogelijk om lokale schijven te koppelen. Selecteer een van de koppelpunten. Dit is de locatie waar de schijf verschijnt in het bestandssysteem. Selecteer een van de schijfopties. In normale omstandigheden hoef je geen type schijf te selecteren omdat dit automatisch gedetecteerd wordt. Klik <i>Toevoegen</i> om de schijf te koppelen met dit apparaat. Als dit gelukt is dan verschijnt de schijf in de lijst van <i>Gekoppelde Bestandssystemen</i> bovenaan deze pagina. Indien uw schijf meer dan &eacute;&eacute;n partitie heeft dan moet je erop letten dat je de gewenste koppelt.</li>" ..
-		"<li>Via het <i><b>Koppel Netwerkschijf</b></i> sectie kan je netwerkschijven koppelen. Selecteer een van de koppelpunten. Voer daarna het adres van de netwerkschijf in en selecteer het type. Voor Windows (Cifs) schijven moet je een gebruikersnaam, wachtwoord en optioneel een domein invoeren. Klik <i>Toevoegen</i> om de schijf te koppelen met dit apparaat. Als dit gelukt is dan verschijnt de schijf in de lijst van <i>Gekoppelde Bestandssystemen</i> bovenaan deze pagina.</li>" ..
+		"<li>Via de <i><b>Koppel Lokale Schijf</b></i> sectie is het mogelijk om lokale schijven te koppelen. Selecteer een van de koppelpunten. Dit is de locatie waar de schijf verschijnt in het bestandssysteem. Indien nodig kan je extra optionele koppelopties invoeren in het veld <i>Opties</i>. In normale omstandigheden hoef je geen type schijf te selecteren omdat dit automatisch gedetecteerd wordt. Klik <i>Toevoegen</i> om de schijf te koppelen met dit apparaat. Als dit gelukt is dan verschijnt de schijf in de lijst van <i>Gekoppelde Bestandssystemen</i> bovenaan deze pagina. Indien uw schijf meer dan &eacute;&eacute;n partitie heeft dan moet je erop letten dat je de juiste koppelt.</li>" ..
+		"<li>Via de <i><b>Koppel Netwerkschijf</b></i> sectie kan je netwerkschijven koppelen. Selecteer een van de koppelpunten. Voer daarna het adres van de netwerkschijf in en selecteer het type. Voor Windows (Cifs) schijven moet je een gebruikersnaam, wachtwoord en optioneel een domein invoeren. Klik <i>Toevoegen</i> om de schijf te koppelen met dit apparaat. Als dit gelukt is dan verschijnt de schijf in de lijst van <i>Gekoppelde Bestandssystemen</i> bovenaan deze pagina.</li>" ..
 		"<li>Gekoppelde bestandsystemen zullen automatisch opnieuw gekoppeld worden wanneer dit apparaat herstart en als ze beschikbaar zijn. Om ze te ontkoppelen klik je op de betreffende <i>Ontkoppel</i> knop in de <i>Gekoppelde Bestandssystemen</i> sectie.</li></ul>",
 	},
 	['shutdown'] = {
-		title = "Afsluiten: reboot of stoppen van het apparaat",
+		title = "Afsluiten: herstarten of stoppen van het apparaat",
 		control = "Controle",
 		halt = "Stop",
-		halt_desc = "Apparaat stoppen. Wacht 30 seconden voor het verwijderen van de stroom.",
+		halt_desc = "Apparaat stoppen. Wacht 30 seconden alvorens je de stroom verwijdert.",
 		reboot = "Herstart",
 		reboot_desc = "Om het apparaat te herstarten.",
 		context =
