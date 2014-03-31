@@ -31,7 +31,7 @@ local local_disks   = "/dev/"
 function _mounts()
 	local mounts = {}
 	local storage = {}
-	for _, v in ipairs(cfg.storagedirs) do
+	for _, v in ipairs(cfg.storagedirs or {}) do
 		storage[v] = true
 	end
 
@@ -96,7 +96,7 @@ function mountpoints(mounts)
 	for _, mount in ipairs(mounts) do
 		exclude[mount.mountp] = true
 	end
-	for _, v in ipairs(cfg.storagedirs) do
+	for _, v in ipairs(cfg.storagedirs or {}) do
 	    if not exclude[v] then
 			t[#t+1] = v
 	    end

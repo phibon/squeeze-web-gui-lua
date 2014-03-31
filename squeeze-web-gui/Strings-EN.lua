@@ -3,6 +3,7 @@ return {
 	['languages'] = {
 		EN = "English",
 		DE = "German",
+		NL = "Dutch",
 	},
 	['index'] = {
 		title = "Web Configuration",
