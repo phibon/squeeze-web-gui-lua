@@ -30,7 +30,7 @@ return {
 		"<ul><li>Via deze pagina kan je de instellingen van het Linux besturingsysteem aanpassen van uw apparaat.</li>" ..
 		"<li><i><b>Hostnaam</b></i> is de naam van uw apparaat. Deze kan verschillen van de naam van de speler instantie die op dit apparaat actief is. Deze naam wordt getoont in de lijst van namen van machines in uw netwerk als andere apparaten deze tonen.</li>" ..
 		"<li><i><b>Locatie</b></i> instellingen defini&euml;ren de tijdzone en taal van het apparaat volgens uw locatie.</li>" ..
-		"<li><i><b>Samba</b></i> instellingen specificeren de instellingen van de bestandsdeling van de Windows Server in dit apparaat. Dit wordt gebruikt zodat u toegang heeft tot de schijven van andere machines op het netwerk. Schijven worden gekoppeld via het Opslag menu.</li></ul>",
+		"<li><i><b>Samba</b></i> instellingen specificeren de instellingen van de bestandsdeling van de Windows Server in dit apparaat. Dit wordt gebruikt zodat u toegang heeft tot de schijven van andere machines in uw netwerk. Schijven worden gekoppeld via het Opslag menu.</li></ul>",
 	},
 	['network'] = {
 		title_eth  = "Ethernet Interface Configuratie",
@@ -38,7 +38,7 @@ return {
 		interface = "Interface",
 		state = "Status",
 		ipv4 = "IP Adres",
-		static = "Vast",
+		static = "Statisch",
 		name  = "Naam",
 		type  = "Type",
 		wpa_state = "Wpa Status",
@@ -145,7 +145,7 @@ return {
 		name_tip = "Naam van de speler (optioneel)",
 		device_tip = "Selecteer een uitvoerapparaat",
 		alsa_buffer_tip = "Alsa buffergrootte in ms of bytes (optioneel)",
-		alsa_period_tip = "Alsa periode graaf of grootte in bytes (optioneel)",
+		alsa_period_tip = "Alsa period size; aantal cpu interrupts (optioneel)",
 		alsa_format_tip = "Alsa sample-formaat (optioneel)",
 		alsa_mmap_tip = "Alsa MMAP ondersteuning (optioneel)",
 		rate_tip = " Max ondersteunde samplefrequentie of door komma's gescheiden lijst van samplefrequenties (optioneel)",
@@ -165,7 +165,7 @@ return {
 		linear = "Lineaire Fase",
 		intermediate = "Tussenliggende Fase",
 		minimum = "Minimale Fase",
-		steep = "Steile Filter",
+		steep = "Steil Filter",
 		resample_options = "Soxr Opties",
 		flags = "Vlaggen",
 		attenuation = "Demping",
@@ -178,7 +178,7 @@ return {
 		resample_quality_tip = "Kwaliteit hersamplen (hogere kwaliteit gebruikt meer verwerkingskracht)",
 		resample_filter_tip = "Hersamplen type filter",
 		resample_steep_tip = "Gebruik steile filter",
-		resample_flags_tip = "Hersamplen vlaggen (Hexadecimaal geheel getal), alleen geavanceerde gebruikers",
+		resample_flags_tip = "Hersamplen vlaggen (Hexadecimaal getal), alleen geavanceerde gebruikers",
 		resample_attenuation_tip = "Toe te passen demping in dB om verzadiging te vermijden (standaard 1dB)",
 		resample_precision_tip = "Bits van precisie, (HQ = 20, VHQ = 28)",
 		resample_end_tip = "Passband einde als percentage (Nyquist = 100%)",
@@ -226,7 +226,7 @@ return {
 		"<li><i>Mbv <b>Alsa&nbsp;Parameters</b></i>  kan je de geavanceerde audio instellingen wijzigen van het Linux systeem (Alsa). In princiepe hoef je deze niet aan te passen. Wijzig deze parameters indien de status aangeeft dat uw audioapparaat niet werkt of om de audioweergave te optimaliseren indien de weergave onderbroken wordt. Er zijn vier parameters:" ..
 		"<ul>" ..
 		"<li>Alsa <i>buffertijd</i> in ms, of <i>buffergrootte</i> in bytes; (standaard 40), verhoog deze waarde indien de weergave steeds onderbroken wordt.</li>" ..
-		"<li>Alsa <i>periode graaf</i> of <i>grootte</i> in bytes; (standaard 4).</li>" ..
+		"<li>Alsa <i>periode grootte</i> heeft een invloed op het aantal cpu interrupts. Alleen voor geavanceerde gebruikers. Wijzig deze parameters alleen als je daarvoor opdracht gekregen het van support. (standaard 4).</li>" ..
 		"<li>Alsa <i>sample-formaat</i> is het aantal bits in de datastroom die naar Alsa gestuurd worden voor elke sample - probeer 16 als andere waarden niet werken.</li>" ..
 		"<li>Alsa <i>MMAP:</i> in- of uitschakelen van Alsa MMAP mode die de cpu belasting verkleint. Probeer deze uit te schakelen als de speler niet start.</li>" ..
 		"</ul>" ..
