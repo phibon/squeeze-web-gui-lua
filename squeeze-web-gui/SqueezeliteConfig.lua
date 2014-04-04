@@ -59,7 +59,7 @@ function get()
 			c.alsa_buffer, c.alsa_period, c.alsa_format, c.alsa_mmap = string.match(alsa, "(.-):(.-):(.-):(.-):")
 		end
 		if string.match(line, "MAX_RATE") then	
-			local rate = string.match(line, '^MAX_RATE="%-r%s(.-)"') .. "::"
+			local rate = (string.match(line, '^MAX_RATE="%-r%s(.-)"') or "") .. "::"
 			c.rate, c.rate_delay = string.match(rate, "(.-):(.-):")
 		end
 		if string.match(line, "DOP") then
@@ -68,7 +68,7 @@ function get()
 		end
 		if string.match(line, "UPSAMPLE") then
 			c.resample = string.match(line, '^UPSAMPLE="%-u')
-			local params = (string.match(line, '^UPSAMPLE="%-u%s(.-)"') or "").. ":::::::"
+			local params = (string.match(line, '^UPSAMPLE="%-u%s(.-)"') or "") .. ":::::::"
 			c.resample_recipe, c.resample_flags, c.resample_attenuation, c.resample_precision, c.resample_end, c.resample_start,
 			c.resample_phase = string.match(params, "(.-):(.-):(.-):(.-):(.-):(.-):(.-):")
 		end
