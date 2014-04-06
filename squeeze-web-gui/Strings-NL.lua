@@ -4,6 +4,7 @@ return {
 		EN = "English",
 		DE = "German",
 		NL = "Dutch",
+		SV = "Swedish",
 	},
 	['index'] = {
 		title = "Web Configuratie",

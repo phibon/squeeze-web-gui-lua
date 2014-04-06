@@ -4,6 +4,7 @@ return {
 		EN = "English",
 		DE = "German",
 		NL = "Dutch",
+		SV = "Swedish",
 	},
 	['index'] = {
 		title = "Web Configuration",
@@ -166,7 +167,6 @@ return {
 		intermediate = "Intermediate Phase",
 		minimum = "Minimum Phase",
 		steep = "Steep Filter",
-		resample_options = "Soxr Options",
 		flags = "Flags",
 		attenuation = "Attenuation",
 		precision = "Precision",
@@ -231,7 +231,7 @@ return {
 		"<li>Alsa <i>MMAP</i> enables or disables Alsa MMAP mode which reduces cpu load, try disabling if the player fails to start.</li>" ..
 		"</ul>" ..
 		"<li><i><b>Sample&nbsp;Rates</b></i> allows you to specify the sample rates supported by the device so that it does not need to be present when Squeezelite is started.  Ether specify a single <i>maximum</i> sample rate, or specify all supported rates separated by commas.  You may also specify a delay in ms to add when changing sample rates if you DAC requires this.</li>" ..
-		"<li><i><b>Dop</b></i> enables you to select that your DAC supports DSP over PCM (DoP) playback. You may also specify a delay in ms when switching between PCM and DoP modes.</li></ul>",
+		"<li><i><b>Dop</b></i> enables you to select that your DAC supports DSD over PCM (DoP) playback. You may also specify a delay in ms when switching between PCM and DoP modes.</li></ul>",
 		context_resample = 
 		"<p><ul><li><i><b>Resample</b></i> enables software resampling (upsampling) using the high quality SoX Resampler library.  By default audio is upsampled to the maximum synchronous sample rate supported by the output device.</li>" ..
 		"<li>Selecting <i><b>Asychronous</b></i> will always resample to the maximum output sample rate.  Selecting <i><b>By Exception</b></i> will only resample when the output device does not support the sample rate of the track being played.</li>" .. 
