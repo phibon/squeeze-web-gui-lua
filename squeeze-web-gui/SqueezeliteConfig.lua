@@ -143,8 +143,14 @@ function validate(c)
 			return v
 		end
 	end
-	-- percent
-	for _, v in ipairs({ 'resample_end', 'resample_start', 'resample_phase' }) do
+	-- percent 0-200
+	for _, v in ipairs({ 'resample_end', 'resample_start' }) do
+		if c[v] and not	((string.match(c[v], "^%d+$") or string.match(c[v], "^%d+%.%d+$")) and tonumber(c[v]) >= 0 and tonumber(c[v]) <= 200) then
+			return v
+		end
+	end
+	-- percent 0-100
+	for _, v in ipairs({ 'resample_phase' }) do
 		if c[v] and not	((string.match(c[v], "^%d+$") or string.match(c[v], "^%d+%.%d+$")) and tonumber(c[v]) >= 0 and tonumber(c[v]) <= 100) then
 			return v
 		end
